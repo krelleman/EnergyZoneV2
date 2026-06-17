@@ -12,5 +12,4 @@ const nextConfig = {
   },
 }
 
-export default nextConfigbash
-pwd
+export default nextConfig
