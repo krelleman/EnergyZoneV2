@@ -45,11 +45,59 @@ async function getUserProfile() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, email, display_name, points, level, fridge, wishlist')
     .eq('id', user.id)
     .single() as { data: User | null }
 
   return profile
+}
+
+async function getFridgeProducts() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('fridge')
+    .eq('id', user.id)
+    .single()
+
+  const fridgeIds = profile?.fridge || []
+  const productIds = Array.isArray(fridgeIds) ? fridgeIds.map((p: any) => Number(p)).filter((p: number) => !isNaN(p)) : []
+
+  if (productIds.length === 0) return []
+
+  const { data } = await supabase
+    .from('products')
+    .select('*')
+    .in('id', productIds) as { data: Product[] | null }
+
+  return (data || []) as Product[]
+}
+
+async function getWishlistProducts() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('wishlist')
+    .eq('id', user.id)
+    .single()
+
+  const wishlistIds = profile?.wishlist || []
+  const productIds = Array.isArray(wishlistIds) ? wishlistIds.map((p: any) => Number(p)).filter((p: number) => !isNaN(p)) : []
+
+  if (productIds.length === 0) return []
+
+  const { data } = await supabase
+    .from('products')
+    .select('*')
+    .in('id', productIds) as { data: Product[] | null }
+
+  return (data || []) as Product[]
 }
 
 async function getReviews() {
@@ -65,15 +113,7 @@ async function getReviews() {
   return data || [] as Review[]
 }
 
-async function getFridgeProducts(productIds: number[]) {
-  if (productIds.length === 0) return []
-  const supabase = await createClient()
-  const { data } = await supabase
-    .from('products')
-    .select('*')
-    .in('id', productIds)
-  return (data || []) as Product[]
-}
+
 
 interface ReviewWithScore extends Review {
   user_score?: number
@@ -172,8 +212,8 @@ export default async function ProfilePage() {
   if (!profile) redirect('/?login=true')
 
   const reviews = await getReviews()
-  const productIds = reviews?.map((r: Review) => r.product_id) || []
-  const fridgeProducts = await getFridgeProducts(productIds)
+  const fridgeProducts = await getFridgeProducts()
+  const wishlistProducts = await getWishlistProducts()
   const favorites = await getFavorites()
 
   const avgScore = reviews.length > 0
@@ -258,7 +298,7 @@ export default async function ProfilePage() {
             <p className="text-sm text-[#a0a0b8]">Køleskab</p>
           </div>
           <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 text-center border border-[#2a2a3e]">
-            <p className="text-2xl font-bold text-white">0</p>
+            <p className="text-2xl font-bold text-white">{wishlistProducts.length}</p>
             <p className="text-sm text-[#a0a0b8]">Ønskeliste</p>
           </div>
           <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 text-center border border-[#2a2a3e]">
@@ -294,7 +334,23 @@ export default async function ProfilePage() {
         {/* Ønskeliste */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Ønskeliste</h2>
-          <p className="text-[#a0a0b8] text-center py-8">Ønskelisten er tom. Tilføj produkter du vil prøve!</p>
+          {wishlistProducts.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+              {wishlistProducts.map((p: Product, index: number) => (
+                <a key={p.id} href={`/product/${p.id}`} className="block group">
+                  <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-3 border border-[#2a2a3e] hover:border-primary transition-all duration-200">
+                    <div className="text-center">
+                      <span className="text-xs mb-1 block">{index < 3 ? ['🥇', '🥈', '🥉'][index] : ''}</span>
+                      <p className="text-xs font-bold text-white truncate">{p.name}</p>
+                      <p className="text-xs text-amber-500 mt-1">{'⭐'.repeat(Math.round(p.company_score || 0))}</p>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[#a0a0b8] text-center py-8">Ønskelisten er tom. Tilføj produkter du vil prøve!</p>
+          )}
         </section>
 
         {/* Showcase - Favoritprodukter (Bite 11.3) */}

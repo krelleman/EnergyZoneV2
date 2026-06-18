@@ -21,9 +21,11 @@ export async function addToFridge(productId: number) {
     .single()
 
   const currentFridge = profile?.fridge || []
-  const newFridge = Array.isArray(currentFridge) 
-    ? currentFridge.includes(productId) ? currentFridge : [...currentFridge, productId]
-    : [productId]
+  const productIdNum = Number(productId)
+  const productExists = Array.isArray(currentFridge) && currentFridge.some((p: any) => Number(p) === productIdNum)
+  const newFridge = !productExists 
+    ? Array.isArray(currentFridge) ? [...currentFridge, productId] : [productId]
+    : currentFridge
 
   const { error } = await supabase
     .from('profiles')
@@ -56,9 +58,11 @@ export async function addToWishlist(productId: number) {
     .single()
 
   const currentWishlist = profile?.wishlist || []
-  const newWishlist = Array.isArray(currentWishlist)
-    ? currentWishlist.includes(productId) ? currentWishlist : [...currentWishlist, productId]
-    : [productId]
+  const productIdNum = Number(productId)
+  const productExists = Array.isArray(currentWishlist) && currentWishlist.some((p: any) => Number(p) === productIdNum)
+  const newWishlist = !productExists
+    ? Array.isArray(currentWishlist) ? [...currentWishlist, productId] : [productId]
+    : currentWishlist
 
   const { error } = await supabase
     .from('profiles')
