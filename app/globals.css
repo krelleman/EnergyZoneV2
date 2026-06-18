@@ -243,3 +243,11 @@
   0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.2); border-color: #ff3333; }
   50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.4); border-color: #ff6666; }
 }
+
+/* ===== ADMIN NAVN ===== */
+.name-admin {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ff3333;
+  text-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+}
