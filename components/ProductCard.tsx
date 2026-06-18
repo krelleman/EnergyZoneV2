@@ -1,7 +1,10 @@
-// components/ProductCard.tsx
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { useToast } from '@/context/ToastContext'
+import { addToFridge, addToWishlist } from '@/lib/actions'
+import { useState } from 'react'
 
 interface Product {
   id: number
@@ -21,6 +24,7 @@ interface Product {
 
 export default function ProductCard({ product }: { product: Product }) {
   const { showToast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const stars = '⭐'.repeat(Math.round(product.company_score || 0))
   const emptyStars = '☆'.repeat(6 - Math.round(product.company_score || 0))
   const totalScore = product.total_score || 0
@@ -95,7 +99,7 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
           )}
 
-          {/* Price + Button */}
+{/* Price + Buttons */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
             <div>
               {product.price_min_dkk && product.price_max_dkk ? (
@@ -113,15 +117,36 @@ export default function ProductCard({ product }: { product: Product }) {
                 <span className="text-xl font-bold text-primary">{product.price_dkk} kr</span>
               )}
             </div>
-            <button
-              onClick={(e) => {
-                e.preventDefault()
-                showToast(`${product.name} tilføjet til køleskabet!`, 'success', '🧊')
-              }}
-              className="text-xs bg-primary text-white px-3 py-1.5 rounded-full hover:bg-primary-dark transition-colors"
-            >
-              Jeg har drukket den
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={async (e) => {
+                  e.preventDefault()
+                  setIsSubmitting(true)
+                  console.log('🍺 Tilføjer til køleskab:', product.name)
+                  await addToFridge(product.id)
+                  showToast(`${product.name} tilføjet til køleskabet!`, 'success', '🧊')
+                  setIsSubmitting(false)
+                }}
+                disabled={isSubmitting}
+                className="text-xs bg-primary text-white px-3 py-1.5 rounded-full hover:bg-primary-dark transition-colors disabled:opacity-50"
+              >
+                {isSubmitting ? 'Tilføjer...' : 'Jeg har drukket den'}
+              </button>
+              <button
+                onClick={async (e) => {
+                  e.preventDefault()
+                  setIsSubmitting(true)
+                  console.log('❤️ Tilføjer til ønskeliste:', product.name)
+                  await addToWishlist(product.id)
+                  showToast(`${product.name} tilføjet til ønskelisten!`, 'info', '❤️')
+                  setIsSubmitting(false)
+                }}
+                disabled={isSubmitting}
+                className="text-xs bg-gray-700 text-white px-3 py-1.5 rounded-full hover:bg-gray-600 transition-colors disabled:opacity-50"
+              >
+                ❤️ Ønskeliste
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -226,7 +226,7 @@ export default async function ProductPage({ params }: PageProps) {
           )}
 
           {/* Knapper */}
-          <ProductActionsClient productName={product.name} />
+          <ProductActionsClient productId={product.id} productName={product.name} />
 
           {/* Find i butik */}
           {stores && stores.length > 0 && (

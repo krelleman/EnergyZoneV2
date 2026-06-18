@@ -29,38 +29,23 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <ToastContainer toasts={toasts} />
-    </ToastContext.Provider>
-  )
-}
-
-function ToastContainer({ toasts }: { toasts: Toast[] }) {
-  if (toasts.length === 0) return null
-
-  return (
-    <div className="fixed top-6 right-6 z-50 flex flex-col gap-2">
-      {toasts.map(toast => (
-        <div
-          key={toast.id}
-          className="bg-[#1a1a2e] border-l-4 rounded-r-lg px-4 py-3 pr-8 shadow-lg transform translate-x-full animate-slide-in"
-          style={{
-            borderLeftColor: toast.type === 'success' ? '#10b981' : toast.type === 'error' ? '#ef4444' : '#3b82f6',
-            animation: 'slideIn 0.3s ease-out forwards'
-          }}
-        >
-          <div className="flex items-center gap-2">
-            {toast.emoji && <span>{toast.emoji}</span>}
-            <span className="text-sm text-white">{toast.message}</span>
+      <div className="fixed top-6 right-6 z-50 flex flex-col gap-2">
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            className="bg-[#1a1a2e] border-l-4 rounded-r-lg px-4 py-3 pr-8 shadow-lg animate-slide-in"
+            style={{
+              borderLeftColor: toast.type === 'success' ? '#10b981' : toast.type === 'error' ? '#ef4444' : '#3b82f6',
+            }}
+          >
+            <div className="flex items-center gap-2">
+              {toast.emoji && <span>{toast.emoji}</span>}
+              <span className="text-sm text-white">{toast.message}</span>
+            </div>
           </div>
-        </div>
-      ))}
-      <style jsx>{`
-        @keyframes slideIn {
-          from { transform: translateX(100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-      `}</style>
-    </div>
+        ))}
+      </div>
+    </ToastContext.Provider>
   )
 }
 
