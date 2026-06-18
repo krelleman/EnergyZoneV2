@@ -1,6 +1,5 @@
 // components/ReviewsSection.tsx
 import { createClient } from '@/utils/supabase/server'
-import LevelTable from './LevelTable'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -93,10 +92,6 @@ export default async function ReviewsSection() {
             <p className="text-gray-400 text-center py-8 col-span-full">Ingen anmeldelser endnu</p>
           )}
         </div>
-
-        {/* Level Table */}
-        <LevelTable />
-      </div>
     </section>
   )
 }

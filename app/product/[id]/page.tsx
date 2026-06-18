@@ -27,6 +27,14 @@ interface Product {
   total_score?: number
 }
 
+interface Store {
+  id: number
+  product_id: number
+  store_name: string
+  price_dkk: number
+  last_seen_date: string
+}
+
 interface Review {
   id: number
   user_id: string
@@ -66,6 +74,13 @@ export default async function ProductPage({ params }: PageProps) {
     .eq('brand', product.brand)
     .neq('id', productId)
     .limit(4) as { data: Product[] | null }
+
+  // Hent butikker
+  const { data: stores } = await supabase
+    .from('product_stores')
+    .select('*')
+    .eq('product_id', productId)
+    .order('price_dkk', { ascending: true }) as { data: Store[] | null }
 
   // Beregn gennemsnitlig bruger-score
   const avgUserScore = reviews && reviews.length > 0
@@ -218,6 +233,29 @@ export default async function ProductPage({ params }: PageProps) {
               ❤️ Ønskeliste
             </button>
           </div>
+
+          {/* Find i butik */}
+          {stores && stores.length > 0 && (
+            <section className="mt-8">
+              <h3 className="text-lg font-bold text-gray-800 mb-3">Find i butik</h3>
+              <div className="space-y-2">
+                {stores.map((store) => (
+                  <div key={store.id} className="bg-gray-50 rounded-xl p-3 flex justify-between items-center">
+                    <div>
+                      <p className="font-bold text-gray-800">{store.store_name}</p>
+                      <p className="text-sm text-gray-400">{new Date(store.last_seen_date).toLocaleDateString('da-DK')}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-lg font-bold text-primary">{store.price_dkk} kr</span>
+                      {store.price_dkk === Math.min(...stores.map(s => s.price_dkk)) && (
+                        <span className="block text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">Billigst!</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </div>
 

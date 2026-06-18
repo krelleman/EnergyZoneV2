@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import AuthModal from "@/components/AuthModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,9 +23,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="da">
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${geistSans.className} antialiased bg-gradient-to-b from-gray-900 to-black min-h-screen`}>
         <Header />
         {children}
+        <AuthModal />
       </body>
     </html>
   );

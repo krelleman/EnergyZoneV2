@@ -6,7 +6,8 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 
 export default function Header() {
-  const [user, setUser] = useState<{ email?: string } | null>(null)
+  const [user, setUser] = useState<{ email?: string; id?: string } | null>(null)
+  const [displayName, setDisplayName] = useState('')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const supabase = createClient()
 
@@ -14,11 +15,30 @@ export default function Header() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
+      if (user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('display_name')
+          .eq('id', user.id)
+          .single()
+        setDisplayName(profile?.display_name || user.email?.split('@')[0] || 'Bruger')
+      }
     }
     getUser()
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null)
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const user = session?.user || null
+      setUser(user)
+      if (user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('display_name')
+          .eq('id', user.id)
+          .single()
+        setDisplayName(profile?.display_name || user.email?.split('@')[0] || 'Bruger')
+      } else {
+        setDisplayName('')
+      }
     })
 
     return () => listener?.subscription.unsubscribe()
@@ -27,6 +47,7 @@ export default function Header() {
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setUser(null)
+    setDisplayName('')
   }
 
   return (
@@ -56,7 +77,7 @@ export default function Header() {
           {user ? (
             <div className="flex items-center gap-3">
               <span className="text-white text-sm font-medium">
-                {user.email?.split('@')[0] || 'Bruger'}
+                👋 Velkommen tilbage, <span className="text-primary font-bold">{displayName}</span>
               </span>
               <button
                 onClick={handleLogout}
@@ -106,7 +127,9 @@ export default function Header() {
           </Link>
           {user ? (
             <>
-              <span className="text-white text-sm">{user.email?.split('@')[0] || 'Bruger'}</span>
+              <span className="text-white text-sm">
+                👋 Velkommen tilbage, <span className="text-primary font-bold">{displayName}</span>
+              </span>
               <button
                 onClick={() => { handleLogout(); setIsMenuOpen(false) }}
                 className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-full text-sm font-bold transition-colors text-left"

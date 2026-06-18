@@ -66,3 +66,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Rank ringe omkring profilbillede */
+.rank-ring {
+  @apply rounded-full inline-block;
+}
+.rank-ring-none { border: 3px solid #4a4a5a; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); }
+.rank-ring-copper { border: 3px solid #B87333; box-shadow: 0 0 20px rgba(184, 115, 51, 0.3); }
+.rank-ring-bronze { border: 3px solid #CD7F32; box-shadow: 0 0 20px rgba(205, 127, 50, 0.3); }
+.rank-ring-silver { border: 3px solid #C0C0C0; box-shadow: 0 0 20px rgba(192, 192, 192, 0.3); }
+.rank-ring-gold { border: 3px solid #FFD700; box-shadow: 0 0 25px rgba(255, 215, 0, 0.4); }
+.rank-ring-platinum { border: 3px solid #A0E6DE; box-shadow: 0 0 25px rgba(160, 230, 222, 0.4); }
+.rank-ring-diamond { border: 3px solid #00FFFF; box-shadow: 0 0 30px rgba(0, 255, 255, 0.5); }
+.rank-ring-master { border: 3px solid #9932CC; box-shadow: 0 0 30px rgba(153, 50, 204, 0.5); }
+.rank-ring-grandmaster { border: 3px solid #D1001C; box-shadow: 0 0 30px rgba(209, 0, 28, 0.5); }
+.rank-ring-champion { border: 3px solid #FF4500; box-shadow: 0 0 30px rgba(255, 69, 0, 0.5); }
+.rank-ring-radiant { 
+  border: 3px solid #1E0F35; 
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.3), 0 0 60px rgba(30, 15, 53, 0.6); 
+  animation: radiant-pulse 2s ease-in-out infinite; 
+}
+
+@keyframes radiant-pulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.2), 0 0 60px rgba(30, 15, 53, 0.4); }
+  50% { box-shadow: 0 0 50px rgba(255, 255, 255, 0.4), 0 0 80px rgba(30, 15, 53, 0.6); }
+}

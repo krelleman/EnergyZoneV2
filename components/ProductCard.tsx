@@ -8,6 +8,9 @@ interface Product {
   brand: string
   sub_brand?: string
   price_dkk: number
+  price_min_dkk?: number
+  price_max_dkk?: number
+  price_avg_dkk?: number
   company_score: number
   thumbnail: string
   tags: string[]
@@ -92,7 +95,22 @@ export default function ProductCard({ product }: { product: Product }) {
 
           {/* Price + Button */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-            <span className="text-xl font-bold text-primary">{product.price_dkk} kr</span>
+            <div>
+              {product.price_min_dkk && product.price_max_dkk ? (
+                <div>
+                  <span className="text-sm font-bold text-primary">
+                    {product.price_min_dkk} - {product.price_max_dkk} kr
+                  </span>
+                  {product.price_avg_dkk && (
+                    <p className="text-xs text-gray-400">
+                      (ca. {product.price_avg_dkk.toFixed(2)} kr)
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <span className="text-xl font-bold text-primary">{product.price_dkk} kr</span>
+              )}
+            </div>
             <button
               onClick={(e) => {
                 e.preventDefault()
