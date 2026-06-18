@@ -42,7 +42,7 @@ export default async function ReviewsSection() {
         {/* Reviews Grid - 4 columns on large screens */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {reviews.length > 0 ? (
-            reviews.map((review) => (
+            reviews.map((review: Review) => (
               <div key={review.id} className="bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-primary transition-all duration-200 flex flex-col h-full">
                 {/* Avatar */}
                 <div className="flex items-center gap-3 mb-3">

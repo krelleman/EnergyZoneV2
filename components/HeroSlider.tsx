@@ -152,7 +152,7 @@ export default function HeroSlider({ products }: HeroSliderProps) {
 
         {products.length > 1 && (
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-            {products.map((_, index) => (
+            {products.map((_product: Product, index: number) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}

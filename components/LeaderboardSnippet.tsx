@@ -31,7 +31,7 @@ export default async function LeaderboardSnippet() {
 
         <div className="max-w-md mx-auto bg-white rounded-2xl shadow-md overflow-hidden">
           {topUsers.length > 0 ? (
-            topUsers.map((user, index) => (
+            topUsers.map((user: LeaderboardUser, index: number) => (
               <div
                 key={user.id}
                 className={`flex items-center justify-between p-4 ${

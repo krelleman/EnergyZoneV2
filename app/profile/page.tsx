@@ -5,6 +5,31 @@ import ProductCard from '@/components/ProductCard'
 import ProfileAvatar from '@/components/ProfileAvatar'
 import { getLevel, LEVELS } from '@/lib/levels'
 
+interface Review {
+  id: number
+  user_id: string
+  product_id: number
+  score: number
+  comment?: string
+  created_at: string
+}
+
+interface Product {
+  id: number
+  name: string
+  brand: string
+  sub_brand?: string
+  price_dkk: number
+  price_min_dkk?: number
+  price_max_dkk?: number
+  price_avg_dkk?: number
+  company_score: number
+  thumbnail: string
+  tags: string[]
+  size_ml: number
+  total_score?: number
+}
+
 interface User {
   id: string
   email: string
@@ -37,7 +62,7 @@ async function getReviews() {
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-  return data || []
+  return data || [] as Review[]
 }
 
 async function getFridgeProducts(productIds: number[]) {
@@ -47,7 +72,7 @@ async function getFridgeProducts(productIds: number[]) {
     .from('products')
     .select('*')
     .in('id', productIds)
-  return data || []
+  return (data || []) as Product[]
 }
 
 export default async function ProfilePage() {
@@ -55,11 +80,11 @@ export default async function ProfilePage() {
   if (!profile) redirect('/?login=true')
 
   const reviews = await getReviews()
-  const productIds = reviews?.map(r => r.product_id) || []
+  const productIds = reviews?.map((r: Review) => r.product_id) || []
   const fridgeProducts = await getFridgeProducts(productIds)
 
   const avgScore = reviews.length > 0
-    ? (reviews.reduce((acc, r) => acc + r.score, 0) / reviews.length).toFixed(1)
+    ? (reviews.reduce((acc: number, r: Review) => acc + r.score, 0) / reviews.length).toFixed(1)
     : '0'
 
   const levelInfo = getLevel(profile.points)
@@ -160,7 +185,7 @@ export default async function ProfilePage() {
           <h2 className="text-2xl font-bold text-white mb-4">Køleskab</h2>
           {fridgeProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-              {fridgeProducts.map((p, index) => (
+              {fridgeProducts.map((p: Product, index: number) => (
                 <div key={p.id} className="group bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-3 border border-[#2a2a3e] hover:border-primary transition-all duration-200">
                   <div className="text-center">
                     <span className="text-xs mb-1 block">{index < 3 ? ['🥇', '🥈', '🥉'][index] : ''}</span>
@@ -186,7 +211,7 @@ export default async function ProfilePage() {
           <h2 className="text-2xl font-bold text-white mb-4">Mine favoritter</h2>
           {fridgeProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {fridgeProducts.slice(0, 3).map((p, index) => (
+              {fridgeProducts.slice(0, 3).map((p: Product, index: number) => (
                 <div key={p.id} className="relative">
                   <ProductCard product={p} />
                   <div className="absolute top-2 left-2 text-lg">
@@ -211,7 +236,7 @@ export default async function ProfilePage() {
           <h2 className="text-2xl font-bold text-white mb-4">Seneste aktivitet</h2>
           {reviews.length > 0 ? (
             <div className="space-y-3">
-              {reviews.slice(0, 5).map((review) => (
+              {reviews.slice(0, 5).map((review: Review) => (
                 <div key={review.id} className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] flex justify-between">
                   <div>
                     <span className="text-amber-500">{'⭐'.repeat(review.score)}</span>
@@ -230,7 +255,7 @@ export default async function ProfilePage() {
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Badges</h2>
           <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-            {['🥇', '🥈', '🥉'].map((badge) => (
+            {['🥇', '🥈', '🥉'].map((badge: string) => (
               <div key={badge} className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] text-center">
                 <span className="text-2xl block mb-1">{badge}</span>
                 <span className="text-xs text-[#a0a0b8]">T unlocked</span>

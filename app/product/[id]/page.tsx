@@ -147,7 +147,7 @@ export default async function ProductPage({ params }: PageProps) {
           {/* Tags */}
           {product.tags && product.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {product.tags.map((tag) => (
+              {product.tags.map((tag: string) => (
                 <span key={tag} className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">
                   #{tag}
                 </span>
@@ -239,7 +239,7 @@ export default async function ProductPage({ params }: PageProps) {
             <section className="mt-8">
               <h3 className="text-lg font-bold text-gray-800 mb-3">Find i butik</h3>
               <div className="space-y-2">
-                {stores.map((store) => (
+                {stores.map((store: Store) => (
                   <div key={store.id} className="bg-gray-50 rounded-xl p-3 flex justify-between items-center">
                     <div>
                       <p className="font-bold text-gray-800">{store.store_name}</p>
@@ -265,7 +265,7 @@ export default async function ProductPage({ params }: PageProps) {
 
         {reviews && reviews.length > 0 ? (
           <div className="space-y-4">
-            {reviews.map((review) => (
+            {reviews.map((review: Review) => (
               <div key={review.id} className="bg-gray-50 rounded-xl p-4">
                 <div className="flex justify-between items-start">
                   <div>
@@ -292,7 +292,7 @@ export default async function ProductPage({ params }: PageProps) {
         <section className="mt-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Relaterede produkter</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {relatedProducts.map((p) => (
+            {relatedProducts.map((p: Product) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

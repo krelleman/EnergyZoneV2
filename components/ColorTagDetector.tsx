@@ -127,7 +127,7 @@ export default function ColorTagDetector({ onColorTagsDetected }: ColorTagDetect
           ) : detected.length > 0 ? (
             <div className="flex items-center gap-3 flex-wrap">
               <span className="text-sm font-medium">🎨 Dominante farver:</span>
-              {detected.map((color) => (
+              {detected.map((color: string) => (
                 <span
                   key={color}
                   className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 border"

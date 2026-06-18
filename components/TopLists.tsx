@@ -14,7 +14,13 @@ interface Product {
   size_ml: number
 }
 
-async function getTopProducts() {
+interface TopList {
+  title: string
+  products: Product[]
+  emptyMessage: string
+}
+
+async function getTopProducts(): Promise<{ popular: Product[]; cheapest: Product[]; strawberry: Product[] }> {
   const supabase = await createClient()
 
   // 1. Mest populære (højeste total_score)
@@ -39,9 +45,9 @@ async function getTopProducts() {
     .limit(6)
 
   return {
-    popular: popular || [],
-    cheapest: cheapest || [],
-    strawberry: lowScore || [],
+    popular: (popular || []) as Product[],
+    cheapest: (cheapest || []) as Product[],
+    strawberry: (lowScore || []) as Product[],
   }
 }
 
@@ -85,7 +91,7 @@ function ProductMiniCard({ product, rank }: { product: Product; rank: number }) 
 export default async function TopLists() {
   const { popular, cheapest, strawberry } = await getTopProducts()
 
-  const lists = [
+  const lists: TopList[] = [
     {
       title: '🔥 Mest populære',
       products: popular,
@@ -112,12 +118,12 @@ export default async function TopLists() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {lists.map((list) => (
+          {lists.map((list: TopList) => (
             <div key={list.title} className="bg-gray-900/50 rounded-2xl p-4 border border-gray-700">
               <h3 className="text-xl font-bold mb-4 text-white">{list.title}</h3>
               <div className="space-y-2">
                 {list.products.length > 0 ? (
-                  list.products.slice(0, 6).map((product, index) => (
+                  list.products.slice(0, 6).map((product: Product, index: number) => (
                     <ProductMiniCard key={product.id} product={product} rank={index + 1} />
                   ))
                 ) : (

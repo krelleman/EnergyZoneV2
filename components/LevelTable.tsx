@@ -1,12 +1,12 @@
 // components/LevelTable.tsx
-import { LEVELS } from '@/lib/levels'
+import { LEVELS, type Level } from '@/lib/levels'
 
 export default function LevelTable() {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
       <h3 className="text-xl font-bold mb-4 text-center">⚡ Levels</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-        {LEVELS.map((level) => (
+        {LEVELS.map((level: Level) => (
           <div
             key={level.level}
             className={`text-center p-3 rounded-xl border ${

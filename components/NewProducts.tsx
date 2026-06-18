@@ -32,7 +32,7 @@ async function getAllTags() {
   
   // Aggregate tags by frequency
   const tagCounts: Record<string, number> = {}
-  data?.forEach(product => {
+  data?.forEach((product: Product) => {
     if (product.tags) {
       product.tags.forEach((tag: string) => {
         tagCounts[tag] = (tagCounts[tag] || 0) + 1
@@ -45,7 +45,7 @@ async function getAllTags() {
 
 export default async function NewProducts() {
   const products = await getNewProducts()
-  const tags = await getAllTags()
+  const tags = await getAllTags() as Array<{ tag: string; count: number }>
 
   // Size based on frequency (min 12px, max 24px)
   const max = Math.max(...tags.map(t => t.count), 1)
@@ -62,7 +62,7 @@ export default async function NewProducts() {
 
         {/* New Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-12">
-          {products.map((product) => (
+          {products.map((product: Product) => (
             <Link key={product.id} href={`/product/${product.id}`} className="block">
               <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-1 overflow-hidden flex flex-col h-full">
                 <div className="relative h-40 bg-gradient-to-br from-gray-800 to-gray-900">

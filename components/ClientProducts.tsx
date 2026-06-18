@@ -22,6 +22,11 @@ interface Product {
   total_score?: number
 }
 
+interface ProductFilter {
+  label: string
+  value: string | null
+}
+
 interface ClientProductsProps {
   initialProducts: Product[]
 }
@@ -35,8 +40,8 @@ export default function ClientProducts({ initialProducts }: ClientProductsProps)
   // Get unique sub_brands for filter
   const subBrands = useMemo(() => {
     const brands = new Set<string>()
-    products.forEach(p => {
-      if (p.sub_brand) brands.add(p.sub_brand)
+    products.forEach((product: Product) => {
+      if (product.sub_brand) brands.add(product.sub_brand)
     })
     return Array.from(brands).sort()
   }, [products])
@@ -91,7 +96,7 @@ export default function ClientProducts({ initialProducts }: ClientProductsProps)
     return result
   }, [products, search, filter, sort])
 
-  const FILTERS = [
+  const FILTERS: ProductFilter[] = [
     { label: 'Alle', value: null },
     { label: 'Dåse', value: 'dåse' },
     { label: 'Flaske', value: 'flaske' },
@@ -105,7 +110,7 @@ export default function ClientProducts({ initialProducts }: ClientProductsProps)
       <section className="sticky top-16 z-40 bg-white py-3 border-b border-gray-200">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap gap-2 mb-4 justify-center">
-            {FILTERS.map((f) => (
+            {FILTERS.map((f: ProductFilter) => (
               <button
                 key={f.label}
                 onClick={() => setFilter(f.value)}
@@ -122,7 +127,7 @@ export default function ClientProducts({ initialProducts }: ClientProductsProps)
             {subBrands.length > 0 && (
               <>
                 <span className="w-full text-xs text-gray-400 my-1">Underkategorier:</span>
-                {subBrands.map((brand) => (
+                {subBrands.map((brand: string) => (
                   <button
                     key={brand}
                     onClick={() => setFilter(`sub:${brand}`)}
@@ -172,7 +177,7 @@ export default function ClientProducts({ initialProducts }: ClientProductsProps)
           <p className="text-gray-400">Ingen produkter fundet.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
+            {filteredProducts.map((product: Product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

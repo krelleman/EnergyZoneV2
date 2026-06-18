@@ -85,7 +85,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {/* Tags */}
           {product.tags && product.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
-              {product.tags.slice(0, 3).map((tag) => (
+              {product.tags.slice(0, 3).map((tag: string) => (
                 <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                   #{tag}
                 </span>

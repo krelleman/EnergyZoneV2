@@ -1,6 +1,6 @@
 // components/LevelTeaser.tsx
 import { createClient } from '@/utils/supabase/server'
-import { LEVELS, getLevel } from '@/lib/levels'
+import { LEVELS, getLevel, type Level } from '@/lib/levels'
 
 async function getUserLevel() {
   const supabase = await createClient()
@@ -40,7 +40,7 @@ export default async function LevelTeaser() {
 
       {/* Alle levels i en række */}
       <div className="flex flex-wrap justify-center gap-2 mb-4">
-        {LEVELS.map((level) => (
+        {LEVELS.map((level: Level) => (
           <span
             key={level.level}
             className={`px-3 py-1 rounded-full text-xs ${
