@@ -10,8 +10,34 @@ interface LeaderboardUser {
   level: number
 }
 
+interface Friend {
+  id: string
+  display_name?: string
+  total_points: number
+}
+
+async function getFriends(userId: string) {
+  const supabase = await createClient()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('friends')
+    .eq('id', userId)
+    .single()
+
+  const friendIds = profile?.friends || []
+  if (friendIds.length === 0) return []
+
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, display_name, total_points')
+    .in('id', friendIds) as { data: Friend[] | null }
+
+  return data || []
+}
+
 export default async function LeaderboardPage() {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const { data: users } = await supabase
     .from('profiles')
@@ -20,6 +46,7 @@ export default async function LeaderboardPage() {
     .limit(10) as { data: LeaderboardUser[] | null }
 
   const topUsers = users || []
+  const friendUsers = user ? await getFriends(user.id) : []
 
   return (
     <main className="min-h-screen bg-[#0f0f1a] text-[#e8e8f0] py-8">
@@ -65,7 +92,7 @@ export default async function LeaderboardPage() {
 {/* Række 4-10 */}
              <LeaderboardTabs 
                globalUsers={topUsers.slice(3)} 
-               friendUsers={topUsers.slice(0, 3)} 
+               friendUsers={friendUsers} 
              />
           </>
         ) : (

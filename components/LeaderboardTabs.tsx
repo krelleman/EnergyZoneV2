@@ -4,10 +4,10 @@ import { useState } from 'react'
 
 interface LeaderboardTabsProps {
   globalUsers: any[]
-  friendUsers: any[]
+  friendUsers?: any[]
 }
 
-export default function LeaderboardTabs({ globalUsers, friendUsers }: LeaderboardTabsProps) {
+export default function LeaderboardTabs({ globalUsers, friendUsers = [] }: LeaderboardTabsProps) {
   const [activeTab, setActiveTab] = useState('global')
 
   return (
@@ -56,7 +56,8 @@ export default function LeaderboardTabs({ globalUsers, friendUsers }: Leaderboar
                 </div>
               </div>
             ))
-          : friendUsers.map((user, index) => (
+          : friendUsers.length > 0
+          ? friendUsers.map((user, index) => (
               <div
                 key={user.id}
                 className="slide-in bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] flex items-center justify-between"
@@ -74,7 +75,10 @@ export default function LeaderboardTabs({ globalUsers, friendUsers }: Leaderboar
                   <span className="text-primary font-bold">{user.total_points || 0} point</span>
                 </div>
               </div>
-            ))}
+            ))
+          : (
+              <p className="text-gray-400 text-center py-8">Du har ingen venner endnu. Tilføj venner på profilen!</p>
+            )}
       </div>
     </>
   )
