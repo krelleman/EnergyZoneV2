@@ -116,6 +116,35 @@ async function getWishlistProducts() {
   return (data || []) as Product[]
 }
 
+async function getFriends() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('friends')
+    .eq('id', user.id)
+    .single()
+
+  if (error) {
+    console.log('Friends fejl:', error)
+    return []
+  }
+
+  const friendIds = profile?.friends || []
+  const ids = Array.isArray(friendIds) ? friendIds.map((p: any) => Number(p)).filter((p: number) => !isNaN(p)) : []
+
+  if (ids.length === 0) return []
+
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, display_name, level')
+    .in('id', ids) as { data: { id: string; display_name?: string; level: number }[] | null }
+
+  return data || []
+}
+
 async function getReviews() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -126,10 +155,8 @@ async function getReviews() {
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-  return data || [] as Review[]
+return data || [] as Review[]
 }
-
-
 
 interface ReviewWithScore extends Review {
   user_score?: number
@@ -231,7 +258,9 @@ export default async function ProfilePage() {
   const fridgeProducts = await getFridgeProducts()
   const wishlistProducts = await getWishlistProducts()
   const favorites = await getFavorites()
+  const friends = await getFriends()
 
+  const uniqueBrands = [...new Set(fridgeProducts.map((p: Product) => p.brand))].length
   const avgScore = reviews.length > 0
     ? (reviews.reduce((acc: number, r: Review) => acc + r.score, 0) / reviews.length).toFixed(1)
     : '0'
@@ -323,11 +352,11 @@ export default async function ProfilePage() {
             <p className="text-sm text-[#a0a0b8]">Ønskeliste</p>
           </div>
           <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 text-center border border-[#2a2a3e]">
-            <p className="text-2xl font-bold text-white">0</p>
+            <p className="text-2xl font-bold text-white">{uniqueBrands}</p>
             <p className="text-sm text-[#a0a0b8]">Favorit brands</p>
           </div>
           <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 text-center border border-[#2a2a3e]">
-            <p className="text-2xl font-bold text-white">0</p>
+            <p className="text-2xl font-bold text-white">{friends.length}</p>
             <p className="text-sm text-[#a0a0b8]">Venner</p>
           </div>
         </div>
@@ -408,7 +437,23 @@ export default async function ProfilePage() {
         {/* Venner */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Venner</h2>
-          <p className="text-[#a0a0b8] text-center py-8">Ingen venner endnu. Inviter venner til EnergyZone!</p>
+          {friends.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+              {friends.map((friend: { id: string; display_name?: string; level: number }, index: number) => (
+                <div key={friend.id} className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] text-center">
+                  <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span className="text-primary font-bold text-lg">
+                      {(friend.display_name || 'Ven').charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <p className="text-sm font-bold text-white truncate">{friend.display_name || 'Ven'}</p>
+                  <p className="text-xs text-[#a0a0b8]">{getLevel(friend.level || 0).emoji} Level {friend.level || 0}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[#a0a0b8] text-center py-8">Ingen venner endnu. Inviter venner til EnergyZone!</p>
+          )}
         </section>
 
         {/* Activity feed timeline (Bite 11.5) */}
