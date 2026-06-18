@@ -84,3 +84,65 @@ export async function addToWishlist(productId: number) {
 
   return { success: true }
 }
+
+export async function removeFromWishlist(productId: number) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'Ingen bruger logget ind' }
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('wishlist')
+    .eq('id', user.id)
+    .single()
+
+  const currentWishlist = profile?.wishlist || []
+  const newWishlist = Array.isArray(currentWishlist)
+    ? currentWishlist.filter((id: any) => Number(id) !== Number(productId))
+    : []
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ wishlist: newWishlist })
+    .eq('id', user.id)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}
+
+export async function removeFromFavorites(productId: number) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'Ingen bruger logget ind' }
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('fridge')
+    .eq('id', user.id)
+    .single()
+
+  const currentFridge = profile?.fridge || []
+  const newFridge = Array.isArray(currentFridge)
+    ? currentFridge.filter((id: any) => Number(id) !== Number(productId))
+    : []
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ fridge: newFridge })
+    .eq('id', user.id)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}

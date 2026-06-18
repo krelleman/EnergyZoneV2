@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
 import ProductActionsClient from '@/components/ProductActionsClient'
+import ReviewForm from '@/components/ReviewForm'
 
 interface PageProps {
   params: {
@@ -40,6 +41,7 @@ interface Review {
   id: number
   user_id: string
   username?: string
+  display_name?: string
   score: number
   comment?: string
   created_at: string
@@ -255,24 +257,24 @@ export default async function ProductPage({ params }: PageProps) {
 
       {/* Anmeldelser */}
       <section className="mt-12">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Anmeldelser</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">📝 Anmeldelser</h2>
 
+        {/* Skriv anmeldelse */}
+        <ReviewForm productId={product.id} />
+
+        {/* Vis anmeldelser */}
         {reviews && reviews.length > 0 ? (
           <div className="space-y-4">
             {reviews.map((review: Review) => (
               <div key={review.id} className="bg-gray-50 rounded-xl p-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-bold text-gray-800">{review.username || review.user_id}</p>
-                    <p className="text-amber-500">{renderStars(review.score)}</p>
+                    <p className="font-bold text-gray-800">{review.display_name || review.username || 'Anonym'}</p>
+                    <p className="text-amber-500">{'⭐'.repeat(review.score)}</p>
+                    {review.comment && <p className="text-gray-600 mt-2">{review.comment}</p>}
                   </div>
-                  <p className="text-sm text-gray-400">
-                    {new Date(review.created_at).toLocaleDateString('da-DK')}
-                  </p>
+                  <p className="text-sm text-gray-400">{new Date(review.created_at).toLocaleDateString('da-DK')}</p>
                 </div>
-                {review.comment && (
-                  <p className="text-gray-600 mt-2">{review.comment}</p>
-                )}
               </div>
             ))}
           </div>

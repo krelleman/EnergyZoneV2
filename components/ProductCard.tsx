@@ -4,7 +4,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useToast } from '@/context/ToastContext'
 import { addToFridge, addToWishlist } from '@/lib/actions'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/utils/supabase/client'
 
 interface Product {
   id: number
@@ -25,6 +26,28 @@ interface Product {
 export default function ProductCard({ product }: { product: Product }) {
   const { showToast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isInFridge, setIsInFridge] = useState(false)
+  const [isInWishlist, setIsInWishlist] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('fridge, wishlist')
+        .eq('id', user.id)
+        .single()
+
+      setIsInFridge(profile?.fridge?.includes(product.id) || false)
+      setIsInWishlist(profile?.wishlist?.includes(product.id) || false)
+      setLoading(false)
+    }
+    checkStatus()
+  }, [product.id])
 
   const stars = '⭐'.repeat(Math.round(product.company_score || 0))
   const emptyStars = '☆'.repeat(6 - Math.round(product.company_score || 0))
@@ -114,50 +137,69 @@ export default function ProductCard({ product }: { product: Product }) {
               )}
             </div>
             <div className="flex gap-1">
-              <button
-                onClick={async (e) => {
-                  e.preventDefault()
-                  showToast(`⏳ Tilføjer ${product.name}...`, 'info', '⏳')
-                  setIsSubmitting(true)
-                  try {
-                    const result = await addToFridge(product.id)
-                    if (result.alreadyExists) {
-                      showToast(`✅ ${product.name} er allerede i køleskabet!`, 'success', '✅')
-                    } else {
-                      showToast(`✅ ${product.name} tilføjet til køleskabet!`, 'success', '🧊')
-                    }
-                  } catch (err) {
-                    showToast(`Der opstod en fejl`, 'error', '❌')
-                  }
-                  setIsSubmitting(false)
-                }}
-                disabled={isSubmitting}
-                className="text-xs bg-primary text-white px-3 py-1.5 rounded-full hover:bg-primary-dark disabled:opacity-50 transition-colors"
-              >
-                {isSubmitting ? 'Tilføjer...' : '🍺 Køleskab'}
-              </button>
-              <button
-                onClick={async (e) => {
-                  e.preventDefault()
-                  showToast(`⏳ Tilføjer til ønskelisten...`, 'info', '⏳')
-                  setIsSubmitting(true)
-                  try {
-                    const result = await addToWishlist(product.id)
-                    if (result.alreadyExists) {
-                      showToast(`💝 ${product.name} er allerede på ønskelisten!`, 'info', '💝')
-                    } else {
-                      showToast(`💝 ${product.name} tilføjet til ønskelisten!`, 'info', '❤️')
-                    }
-                  } catch (err) {
-                    showToast(`Der opstod en fejl`, 'error', '❌')
-                  }
-                  setIsSubmitting(false)
-                }}
-                disabled={isSubmitting}
-                className="text-xs bg-gray-700 text-white px-3 py-1.5 rounded-full hover:bg-gray-600 disabled:opacity-50 transition-colors"
-              >
-                ❤️ Ønskeliste
-              </button>
+              {loading ? (
+                <span className="text-xs text-gray-500">Indlæser...</span>
+              ) : (
+                <>
+                  {isInFridge ? (
+                    <button className="bg-gray-600 text-gray-300 px-3 py-1.5 rounded-full text-xs cursor-not-allowed">
+                      ✅ Allerede i køleskabet
+                    </button>
+                  ) : (
+                    <button
+                      onClick={async (e) => {
+                        e.preventDefault()
+                        showToast(`⏳ Tilføjer ${product.name}...`, 'info', '⏳')
+                        setIsSubmitting(true)
+                        try {
+                          const result = await addToFridge(product.id)
+                          if (result.alreadyExists) {
+                            showToast(`✅ ${product.name} er allerede i køleskabet!`, 'success', '✅')
+                          } else {
+                            showToast(`✅ ${product.name} tilføjet til køleskabet!`, 'success', '🧊')
+                          }
+                        } catch (err) {
+                          showToast(`Der opstod en fejl`, 'error', '❌')
+                        }
+                        setIsSubmitting(false)
+                      }}
+                      disabled={isSubmitting}
+                      className="bg-primary hover:bg-primary-dark text-white px-3 py-1.5 rounded-full text-xs transition-colors"
+                    >
+                      🍺 Jeg har drukket den
+                    </button>
+                  )}
+
+                  {isInWishlist ? (
+                    <button className="bg-gray-600 text-gray-300 px-3 py-1.5 rounded-full text-xs cursor-not-allowed">
+                      💝 Allerede på ønskelisten
+                    </button>
+                  ) : (
+                    <button
+                      onClick={async (e) => {
+                        e.preventDefault()
+                        showToast(`⏳ Tilføjer til ønskelisten...`, 'info', '⏳')
+                        setIsSubmitting(true)
+                        try {
+                          const result = await addToWishlist(product.id)
+                          if (result.alreadyExists) {
+                            showToast(`💝 ${product.name} er allerede på ønskelisten!`, 'info', '💝')
+                          } else {
+                            showToast(`💝 ${product.name} tilføjet til ønskelisten!`, 'info', '❤️')
+                          }
+                        } catch (err) {
+                          showToast(`Der opstod en fejl`, 'error', '❌')
+                        }
+                        setIsSubmitting(false)
+                      }}
+                      disabled={isSubmitting}
+                      className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-full text-xs transition-colors"
+                    >
+                      ❤️
+                    </button>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>

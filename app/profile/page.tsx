@@ -5,6 +5,7 @@ import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
 import ProfileAvatar from '@/components/ProfileAvatar'
 import { getLevel, LEVELS } from '@/lib/levels'
+import RemoveButton from '@/components/RemoveButton'
 
 interface Review {
   id: number
@@ -336,7 +337,7 @@ export default async function ProfilePage() {
                  </div>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm">
                   <span className="text-white/80"><span className="text-primary font-bold">{profile.total_points || 0}</span> point</span>
-                  <span className="text-white/80"><span className="text-amber-400 font-bold">{reviews.length}</span> anmeldelser</span>
+                  <span className="text-white/80"><span className="text-amber-400 font-bold">{reviews.length}</span> {reviews.length === 1 ? 'anmeldelse' : 'anmeldelser'}</span>
                   <span className="text-white/80">Gns. score: <span className="text-amber-400 font-bold">{avgScore}</span>/6</span>
                 </div>
               </div>
@@ -392,7 +393,10 @@ export default async function ProfilePage() {
                 <div key={p.id} className="group bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-3 border border-[#2a2a3e] hover:border-primary transition-all duration-200">
                   <div className="text-center">
                     <span className="text-xs mb-1 block">{index < 3 ? ['🥇', '🥈', '🥉'][index] : ''}</span>
-                    <p className="text-xs font-bold text-white truncate">{p.name}</p>
+                    <div className="flex items-center justify-center gap-1">
+                      <p className="text-xs font-bold text-white truncate">{p.name}</p>
+                      <RemoveButton productId={p.id} type="fridge" />
+                    </div>
                     <p className="text-xs text-amber-500 mt-1">{'⭐'.repeat(Math.round(p.company_score || 0))}</p>
                   </div>
                 </div>
@@ -413,7 +417,10 @@ export default async function ProfilePage() {
                   <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-3 border border-[#2a2a3e] hover:border-primary transition-all duration-200">
                     <div className="text-center">
                       <span className="text-xs mb-1 block">{index < 3 ? ['🥇', '🥈', '🥉'][index] : ''}</span>
-                      <p className="text-xs font-bold text-white truncate">{p.name}</p>
+                      <div className="flex items-center justify-center gap-1">
+                        <p className="text-xs font-bold text-white truncate">{p.name}</p>
+                        <RemoveButton productId={p.id} type="wishlist" />
+                      </div>
                       <p className="text-xs text-amber-500 mt-1">{'⭐'.repeat(Math.round(p.company_score || 0))}</p>
                     </div>
                   </div>
