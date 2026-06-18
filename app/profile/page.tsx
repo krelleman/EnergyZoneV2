@@ -50,9 +50,26 @@ async function getUserProfile() {
     .eq('id', user.id)
     .single()
 
-  if (error) {
-    console.log('Profil fejl:', error)
-    return null
+  // Hvis profilen ikke findes - opret den
+  if (error || !profile) {
+    console.log('Profil findes ikke, opretter...', error)
+    const { data: newProfile, error: createError } = await supabase
+      .from('profiles')
+      .insert({
+        id: user.id,
+        email: user.email,
+        points: 0,
+        level: 0,
+      })
+      .select('*')
+      .single()
+
+    if (createError) {
+      console.log('Fejl ved oprettelse:', createError)
+      return null
+    }
+
+    return newProfile as User | null
   }
 
   return profile as User | null

@@ -26,10 +26,10 @@ export default function Toast({ message, type = 'success', emoji = '✅', durati
   }, [duration, onClose])
 
   const colors = {
-    success: 'border-green-500',
+    success: 'border-primary',
     error: 'border-red-500',
-    info: 'border-blue-500',
-    warning: 'border-yellow-500',
+    info: 'border-primary',
+    warning: 'border-amber-500',
   }
 
   return (
