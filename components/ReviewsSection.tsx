@@ -92,6 +92,7 @@ export default async function ReviewsSection() {
             <p className="text-gray-400 text-center py-8 col-span-full">Ingen anmeldelser endnu</p>
           )}
         </div>
+      </div>
     </section>
   )
 }
