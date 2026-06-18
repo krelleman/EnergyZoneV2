@@ -19,8 +19,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' | 'warning', emoji?: string) => {
+    console.log('🔔 showToast kaldt med:', { message, type, emoji })
     const id = Date.now().toString()
-    setToasts(prev => [...prev, { id, message, type, emoji }])
+    setToasts(prev => {
+      console.log('🔔 setToasts, nye toasts:', [...prev, { id, message, type, emoji }])
+      return [...prev, { id, message, type, emoji }]
+    })
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id))
     }, 3000)
@@ -36,11 +40,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className="fixed top-6 right-6 z-50 flex flex-col gap-2">
+      <div 
+        className="fixed top-6 right-6 z-[9999] flex flex-col gap-2 pointer-events-none"
+        style={{ position: 'fixed', top: '24px', right: '24px' }}
+      >
         {toasts.map(toast => (
           <div
             key={toast.id}
-            className={`bg-[#1a1a2e] border-l-4 rounded-r-lg px-4 py-3 pr-8 shadow-lg animate-slide-in`}
+            className={`bg-[#1a1a2e] border-l-4 rounded-r-lg px-4 py-3 pr-8 shadow-lg pointer-events-auto animate-slide-in`}
             style={{
               borderLeftColor: getBorderColor(toast.type),
             }}
