@@ -153,6 +153,20 @@ function getBadges(userLevel: number, reviewCount: number): Badge[] {
   ]
 }
 
+function getTimeAgo(date: Date): string {
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMins / 60)
+  const diffDays = Math.floor(diffHours / 24)
+
+  if (diffMins < 1) return 'lige nu'
+  if (diffMins < 60) return `${diffMins} min siden`
+  if (diffHours < 24) return `${diffHours} timer siden`
+  if (diffDays < 7) return `${diffDays} dage siden`
+  return date.toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })
+}
+
 export default async function ProfilePage() {
   const profile = await getUserProfile()
   if (!profile) redirect('/?login=true')
@@ -320,23 +334,39 @@ export default async function ProfilePage() {
           <p className="text-[#a0a0b8] text-center py-8">Ingen venner endnu. Inviter venner til EnergyZone!</p>
         </section>
 
-        {/* Aktivitet */}
+        {/* Activity feed timeline (Bite 11.5) */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Seneste aktivitet</h2>
           {reviews.length > 0 ? (
-            <div className="space-y-3">
-              {reviews.slice(0, 5).map((review: Review) => (
-                <div key={review.id} className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] flex justify-between">
-                  <div>
-                    <span className="text-amber-500">{'⭐'.repeat(review.score)}</span>
-                    <span className="text-[#a0a0b8] text-sm ml-2">Anmeldelse skrevet</span>
-                  </div>
-                  <span className="text-xs text-[#a0a0b8]">{new Date(review.created_at).toLocaleDateString('da-DK')}</span>
-                </div>
-              ))}
+            <div className="relative">
+              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-[#2a2a3e]"></div>
+              <div className="space-y-4">
+                {reviews.slice(0, 10).map((review: Review, index: number) => {
+                  const product = fridgeProducts.find((p: Product) => p.id === review.product_id)
+                  const timeAgo = getTimeAgo(new Date(review.created_at))
+                  return (
+                    <div key={review.id} className="relative flex items-start gap-4">
+                      <div className="absolute left-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center z-10">
+                        <span className="text-white text-sm">⭐</span>
+                      </div>
+                      <div className="ml-12 bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] flex-1">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="text-white font-medium">
+                              Du anmeldte {product?.name || 'et produkt'}
+                            </p>
+                            <span className="text-amber-500 text-xs">{'⭐'.repeat(review.score)}</span>
+                          </div>
+                          <span className="text-xs text-[#a0a0b8]">{timeAgo}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           ) : (
-            <p className="text-[#a0a0b8] text-center py-8">Ingen aktivitet endnu. Lav din første anmeldelse!</p>
+            <p className="text-[#a0a0b8] text-center py-8">Du har ingen aktivitet endnu. Begynd at anmelde produkter!</p>
           )}
         </section>
 
