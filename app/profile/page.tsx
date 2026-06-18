@@ -75,12 +75,31 @@ async function getFridgeProducts(productIds: number[]) {
   return (data || []) as Product[]
 }
 
-function getHeroGradient(level: number): string {
-  if (level <= 2) return 'from-[#B87333] via-[#CD7F32] to-[#B87333]'
-  if (level <= 4) return 'from-[#C0C0C0] via-[#FFD700] to-[#C0C0C0]'
-  if (level <= 6) return 'from-[#A0E6DE] via-[#00FFFF] to-[#A0E6DE]'
-  if (level <= 8) return 'from-[#9932CC] via-[#D1001C] to-[#9932CC]'
-  return 'from-[#FF4500] via-[#1E0F35] to-[#FF4500]'
+interface ReviewWithScore extends Review {
+  user_score?: number
+}
+
+async function getFavorites() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data: reviews } = await supabase
+    .from('reviews')
+    .select('product_id, score')
+    .eq('user_id', user.id)
+    .order('score', { ascending: false })
+    .limit(5) as { data: { product_id: number; score: number }[] | null }
+
+  if (!reviews || reviews.length === 0) return []
+
+  const productIds = reviews.map(r => r.product_id)
+  const { data: products } = await supabase
+    .from('products')
+    .select('*')
+    .in('id', productIds) as { data: Product[] | null }
+
+  return products?.map(p => ({ ...p, user_score: reviews.find(r => r.product_id === p.id)?.score })) || []
 }
 
 export default async function ProfilePage() {
@@ -90,6 +109,7 @@ export default async function ProfilePage() {
   const reviews = await getReviews()
   const productIds = reviews?.map((r: Review) => r.product_id) || []
   const fridgeProducts = await getFridgeProducts(productIds)
+  const favorites = await getFavorites()
 
   const avgScore = reviews.length > 0
     ? (reviews.reduce((acc: number, r: Review) => acc + r.score, 0) / reviews.length).toFixed(1)
@@ -153,12 +173,12 @@ export default async function ProfilePage() {
             <span className="text-sm text-[#a0a0b8]">Næste level: {nextLevelData?.title || 'Max'}</span>
             <span className="text-sm font-bold text-primary">{profile.points} / {nextLevelData ? nextLevelData.points.split('-')[0] : 'Max'} point</span>
           </div>
-          <div className="w-full h-2 bg-[#0f0f1a] rounded-full overflow-hidden">
-            <div
-              className={`h-full bg-gradient-to-r ${heroGradient} rounded-full transition-all`}
-              style={{ width: `${nextLevelData ? 100 - (pointsToNextLevel / parseInt(nextLevelData.points.split('-')[0]) * 100) : 100}%` }}
-            />
-          </div>
+<div className="w-full h-2 bg-[#0f0f1a] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all"
+                style={{ width: `${nextLevelData ? 100 - (pointsToNextLevel / parseInt(nextLevelData.points.split('-')[0]) * 100) : 100}%` }}
+              />
+            </div>
           {nextLevelData && (
             <p className="text-xs text-[#a0a0b8] mt-2">
               {pointsToNextLevel} point til næste level ({nextLevelData.title})
@@ -212,22 +232,34 @@ export default async function ProfilePage() {
           <p className="text-[#a0a0b8] text-center py-8">Ønskelisten er tom. Tilføj produkter du vil prøve!</p>
         </section>
 
-        {/* Favoritter */}
+        {/* Showcase - Favoritprodukter (Bite 11.3) */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Mine favoritter</h2>
-          {fridgeProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {fridgeProducts.slice(0, 3).map((p: Product, index: number) => (
-                <div key={p.id} className="relative">
-                  <ProductCard product={p} />
-                  <div className="absolute top-2 left-2 text-lg">
-                    {['🥇', '🥈', '🥉'][index]}
+          {favorites.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+              {favorites.map((p: Product & { user_score?: number }, index: number) => (
+                <a key={p.id} href={`/product/${p.id}`} className="block group">
+                  <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-3 border border-[#2a2a3e] hover:border-primary transition-all duration-200 h-full flex flex-col">
+                    <div className="relative h-32 mb-2 rounded-lg overflow-hidden bg-[#0f0f1a]">
+                      {p.thumbnail ? (
+                        <img src={p.thumbnail} alt={p.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-2xl">⚡</div>
+                      )}
+                    </div>
+                    <h3 className="font-bold text-sm text-white truncate">{p.name}</h3>
+                    <p className="text-xs text-[#a0a0b8] truncate">{p.brand}</p>
+                    <p className="text-xs text-amber-500 mt-1">{p.price_dkk} kr</p>
+                    <div className="mt-2 pt-2 border-t border-[#2a2a3e]">
+                      <span className="text-amber-500">{'⭐'.repeat(p.user_score || 0)}</span>
+                      <span className="text-xs text-[#a0a0b8] ml-1">din score</span>
+                    </div>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           ) : (
-            <p className="text-[#a0a0b8] text-center py-8">Ingen favoritter endnu</p>
+            <p className="text-[#a0a0b8] text-center py-8">Du har ingen favoritter endnu. Anmeld nogle produkter for at få dem vist her!</p>
           )}
         </section>
 
