@@ -121,8 +121,11 @@ export default function ProductCard({ product }: { product: Product }) {
               <button
                 onClick={async (e) => {
                   e.preventDefault()
+                  console.log('🍺 1. Klik registreret')
+                  console.log('🍺 2. showToast type:', typeof showToast)
                   setIsSubmitting(true)
                   const result = await addToFridge(product.id)
+                  console.log('🍺 3. Resultat fra addToFridge:', result)
                   if (result.alreadyExists) {
                     showToast(`${product.name} er allerede i køleskabet!`, 'warning', '⚠️')
                   } else {

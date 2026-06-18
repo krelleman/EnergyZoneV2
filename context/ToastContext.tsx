@@ -40,7 +40,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map(toast => (
           <div
             key={toast.id}
-            className="bg-[#1a1a2e] border-l-4 rounded-r-lg px-4 py-3 pr-8 shadow-lg animate-slide-in"
+            className={`bg-[#1a1a2e] border-l-4 rounded-r-lg px-4 py-3 pr-8 shadow-lg animate-slide-in`}
             style={{
               borderLeftColor: getBorderColor(toast.type),
             }}
@@ -52,15 +52,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           </div>
         ))}
       </div>
-      <style jsx>{`
-        @keyframes slideIn {
-          from { transform: translateX(100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        .animate-slide-in {
-          animation: slideIn 0.3s ease-out forwards;
-        }
-      `}</style>
     </ToastContext.Provider>
   )
 }

@@ -13,14 +13,22 @@ export default function ProductActionsClient({ productId, productName }: Product
   const { showToast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  console.log('🔧 ProductActionsClient render - showToast type:', typeof showToast)
+
   return (
     <div className="flex flex-wrap gap-3">
       <button
         onClick={async () => {
+          console.log('🍺 1. Klik registreret på produktside')
+          console.log('🍺 2. showToast type:', typeof showToast)
           setIsSubmitting(true)
-          console.log('🍺 Tilføjer til køleskab:', productName)
-          await addToFridge(productId)
-          showToast(`${productName} tilføjet til køleskabet!`, 'success', '🧊')
+          const result = await addToFridge(productId)
+          console.log('🍺 3. Resultat fra addToFridge:', result)
+          if (result.alreadyExists) {
+            showToast(`${productName} er allerede i køleskabet!`, 'warning', '⚠️')
+          } else {
+            showToast(`${productName} tilføjet til køleskabet!`, 'success', '🧊')
+          }
           setIsSubmitting(false)
         }}
         disabled={isSubmitting}
@@ -30,10 +38,14 @@ export default function ProductActionsClient({ productId, productName }: Product
       </button>
       <button
         onClick={async () => {
+          console.log('❤️ 1. Klik registreret på produktside')
           setIsSubmitting(true)
-          console.log('❤️ Tilføjer til ønskeliste:', productName)
-          await addToWishlist(productId)
-          showToast(`${productName} tilføjet til ønskelisten!`, 'info', '❤️')
+          const result = await addToWishlist(productId)
+          if (result.alreadyExists) {
+            showToast(`${productName} er allerede i ønskelisten!`, 'warning', '⚠️')
+          } else {
+            showToast(`${productName} tilføjet til ønskelisten!`, 'info', '❤️')
+          }
           setIsSubmitting(false)
         }}
         disabled={isSubmitting}
