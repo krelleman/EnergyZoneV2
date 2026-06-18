@@ -151,7 +151,7 @@ export default async function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => (
+                {users.map((u: User) => (
                   <tr key={u.id} className="border-b border-gray-700/50 last:border-0">
                     <td className="py-2 text-white">{u.display_name || u.email?.split('@')[0]}</td>
                     <td className="py-2 text-gray-400">{u.email}</td>
@@ -175,7 +175,7 @@ export default async function AdminPage() {
         <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
           {reviews.length > 0 ? (
             <div className="space-y-4">
-              {reviews.map((r) => (
+              {reviews.map((r: Review) => (
                 <div key={r.id} className="flex items-start justify-between bg-gray-900/50 rounded-lg p-3">
                   <div>
                     <p className="text-white font-bold">{r.products?.name || 'Ukendt produkt'}</p>
@@ -200,7 +200,7 @@ export default async function AdminPage() {
           <form action={`/api/stores`} method="POST" className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <select name="product_id" className="bg-gray-900 text-white px-4 py-2 rounded-full" required>
               <option value="">Vælg produkt</option>
-              {products.map((p) => (
+               {products.map((p: Product) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
