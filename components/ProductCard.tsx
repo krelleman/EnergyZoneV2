@@ -1,6 +1,7 @@
 // components/ProductCard.tsx
 import Link from 'next/link'
 import Image from 'next/image'
+import { useToast } from '@/context/ToastContext'
 
 interface Product {
   id: number
@@ -19,6 +20,7 @@ interface Product {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
+  const { showToast } = useToast()
   const stars = '⭐'.repeat(Math.round(product.company_score || 0))
   const emptyStars = '☆'.repeat(6 - Math.round(product.company_score || 0))
   const totalScore = product.total_score || 0
@@ -114,7 +116,7 @@ export default function ProductCard({ product }: { product: Product }) {
             <button
               onClick={(e) => {
                 e.preventDefault()
-                alert(`Tilføjede ${product.name} til køleskabet!`)
+                showToast(`${product.name} tilføjet til køleskabet!`, 'success', '🧊')
               }}
               className="text-xs bg-primary text-white px-3 py-1.5 rounded-full hover:bg-primary-dark transition-colors"
             >

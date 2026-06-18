@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
+import ProductActionsClient from '@/components/ProductActionsClient'
 
 interface PageProps {
   params: {
@@ -225,14 +226,7 @@ export default async function ProductPage({ params }: PageProps) {
           )}
 
           {/* Knapper */}
-          <div className="flex flex-wrap gap-3">
-            <button className="flex-1 bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-full font-bold transition-colors">
-              🍺 Jeg har drukket den
-            </button>
-            <button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-full font-bold transition-colors">
-              ❤️ Ønskeliste
-            </button>
-          </div>
+          <ProductActionsClient productName={product.name} />
 
           {/* Find i butik */}
           {stores && stores.length > 0 && (
