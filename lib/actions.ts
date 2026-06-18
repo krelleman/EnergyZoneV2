@@ -23,9 +23,13 @@ export async function addToFridge(productId: number) {
   const currentFridge = profile?.fridge || []
   const productIdNum = Number(productId)
   const productExists = Array.isArray(currentFridge) && currentFridge.some((p: any) => Number(p) === productIdNum)
-  const newFridge = !productExists 
-    ? Array.isArray(currentFridge) ? [...currentFridge, productId] : [productId]
-    : currentFridge
+
+  if (productExists) {
+    console.log('🍺 Produkt findes allerede i køleskabet')
+    return { success: true, alreadyExists: true }
+  }
+
+  const newFridge = Array.isArray(currentFridge) ? [...currentFridge, productId] : [productId]
 
   const { error } = await supabase
     .from('profiles')
@@ -60,9 +64,13 @@ export async function addToWishlist(productId: number) {
   const currentWishlist = profile?.wishlist || []
   const productIdNum = Number(productId)
   const productExists = Array.isArray(currentWishlist) && currentWishlist.some((p: any) => Number(p) === productIdNum)
-  const newWishlist = !productExists
-    ? Array.isArray(currentWishlist) ? [...currentWishlist, productId] : [productId]
-    : currentWishlist
+
+  if (productExists) {
+    console.log('❤️ Produkt findes allerede i ønskelisten')
+    return { success: true, alreadyExists: true }
+  }
+
+  const newWishlist = Array.isArray(currentWishlist) ? [...currentWishlist, productId] : [productId]
 
   const { error } = await supabase
     .from('profiles')

@@ -122,9 +122,12 @@ export default function ProductCard({ product }: { product: Product }) {
                 onClick={async (e) => {
                   e.preventDefault()
                   setIsSubmitting(true)
-                  console.log('🍺 Tilføjer til køleskab:', product.name)
-                  await addToFridge(product.id)
-                  showToast(`${product.name} tilføjet til køleskabet!`, 'success', '🧊')
+                  const result = await addToFridge(product.id)
+                  if (result.alreadyExists) {
+                    showToast(`${product.name} er allerede i køleskabet!`, 'warning', '⚠️')
+                  } else {
+                    showToast(`${product.name} tilføjet til køleskabet!`, 'success', '🧊')
+                  }
                   setIsSubmitting(false)
                 }}
                 disabled={isSubmitting}
@@ -136,9 +139,12 @@ export default function ProductCard({ product }: { product: Product }) {
                 onClick={async (e) => {
                   e.preventDefault()
                   setIsSubmitting(true)
-                  console.log('❤️ Tilføjer til ønskeliste:', product.name)
-                  await addToWishlist(product.id)
-                  showToast(`${product.name} tilføjet til ønskelisten!`, 'info', '❤️')
+                  const result = await addToWishlist(product.id)
+                  if (result.alreadyExists) {
+                    showToast(`${product.name} er allerede i ønskelisten!`, 'warning', '⚠️')
+                  } else {
+                    showToast(`${product.name} tilføjet til ønskelisten!`, 'info', '❤️')
+                  }
                   setIsSubmitting(false)
                 }}
                 disabled={isSubmitting}

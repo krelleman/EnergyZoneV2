@@ -5,12 +5,12 @@ import { createContext, useContext, useState, ReactNode } from 'react'
 interface Toast {
   id: string
   message: string
-  type: 'success' | 'error' | 'info'
+  type: 'success' | 'error' | 'info' | 'warning'
   emoji?: string
 }
 
 interface ToastContextType {
-  showToast: (message: string, type: 'success' | 'error' | 'info', emoji?: string) => void
+  showToast: (message: string, type: 'success' | 'error' | 'info' | 'warning', emoji?: string) => void
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined)
@@ -18,12 +18,19 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined)
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info', emoji?: string) => {
+  const showToast = (message: string, type: 'success' | 'error' | 'info' | 'warning', emoji?: string) => {
     const id = Date.now().toString()
     setToasts(prev => [...prev, { id, message, type, emoji }])
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id))
     }, 3000)
+  }
+
+  const getBorderColor = (type: string) => {
+    if (type === 'success') return '#10b981'
+    if (type === 'error') return '#ef4444'
+    if (type === 'warning') return '#f59e0b'
+    return '#3b82f6'
   }
 
   return (
@@ -35,16 +42,25 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={toast.id}
             className="bg-[#1a1a2e] border-l-4 rounded-r-lg px-4 py-3 pr-8 shadow-lg animate-slide-in"
             style={{
-              borderLeftColor: toast.type === 'success' ? '#10b981' : toast.type === 'error' ? '#ef4444' : '#3b82f6',
+              borderLeftColor: getBorderColor(toast.type),
             }}
           >
             <div className="flex items-center gap-2">
-              {toast.emoji && <span>{toast.emoji}</span>}
+              {toast.emoji && <span className="text-lg">{toast.emoji}</span>}
               <span className="text-sm text-white">{toast.message}</span>
             </div>
           </div>
         ))}
       </div>
+      <style jsx>{`
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-slide-in {
+          animation: slideIn 0.3s ease-out forwards;
+        }
+      `}</style>
     </ToastContext.Provider>
   )
 }
