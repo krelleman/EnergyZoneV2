@@ -75,6 +75,14 @@ async function getFridgeProducts(productIds: number[]) {
   return (data || []) as Product[]
 }
 
+function getHeroGradient(level: number): string {
+  if (level <= 2) return 'from-[#B87333] via-[#CD7F32] to-[#B87333]'
+  if (level <= 4) return 'from-[#C0C0C0] via-[#FFD700] to-[#C0C0C0]'
+  if (level <= 6) return 'from-[#A0E6DE] via-[#00FFFF] to-[#A0E6DE]'
+  if (level <= 8) return 'from-[#9932CC] via-[#D1001C] to-[#9932CC]'
+  return 'from-[#FF4500] via-[#1E0F35] to-[#FF4500]'
+}
+
 export default async function ProfilePage() {
   const profile = await getUserProfile()
   if (!profile) redirect('/?login=true')
@@ -88,6 +96,8 @@ export default async function ProfilePage() {
     : '0'
 
   const levelInfo = getLevel(profile.points)
+  const rankClass = levelInfo.rankClass.replace('rank-', '')
+  const gradientClass = `rank-gradient-${rankClass}`
 
   // Calculate next level
   const currentLevelIndex = LEVELS.findIndex(l => l.level === levelInfo.level)
@@ -99,42 +109,38 @@ export default async function ProfilePage() {
     : 0
 
   return (
-    <main className="min-h-screen bg-[#0f0f1a] text-[#e8e8f0] py-8">
+    <main className="min-h-screen bg-[#0f0f1a] text-[#e8e8f0] pb-12">
       <div className="container mx-auto px-4 max-w-6xl">
 
-        {/* Profil header */}
-        <div className="relative mb-12">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a2e] via-[#2d1b4e] to-[#1a1a2e] rounded-3xl -z-10 opacity-50 blur-xl"></div>
-          <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-3xl p-8 border border-[#2a2a3e]">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              {/* Profilbillede med rank ring */}
-              <div className="relative">
+        {/* HERO BANNER - Level gradient (Bite 11.1) */}
+        <div className={`relative rounded-b-3xl overflow-hidden mb-12 h-48 md:h-64 ${gradientClass}`}>
+          <div className="absolute inset-0 opacity-30">
+            <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.15)_0%,transparent_70%)]"></div>
+          </div>
+          <div className="relative h-full flex items-center px-6 md:px-12">
+            <div className="flex flex-col md:flex-row items-center md:items-end gap-4 md:gap-6">
+              <div className="relative -mb-8 md:-mb-12">
                 <ProfileAvatar displayName={profile.display_name || 'Bruger'} level={profile.level || 0} size="lg" />
                 <div className="absolute -bottom-1 -right-1 bg-green-500 w-6 h-6 rounded-full border-2 border-[#1a1a2e] flex items-center justify-center text-xs">
                   ✓
                 </div>
               </div>
-
-              <div className="flex-1 text-center md:text-left">
-                <h1 className="text-4xl font-bold text-white mb-2">
+              <div className="text-center md:text-left">
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
                   {profile.display_name || profile.email?.split('@')[0]}
                 </h1>
-                <p className="text-[#a0a0b8] mb-3">{profile.email}</p>
-
-                <div className="flex flex-wrap justify-center md:justify-start gap-3 mb-4">
-                  <span className="bg-primary/20 text-primary px-4 py-1.5 rounded-full font-bold">
+                <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
+                  <span className="bg-white/10 backdrop-blur-md text-white px-3 py-1 rounded-full font-bold text-xs">
                     {levelInfo.title}
                   </span>
-                  <span className={`px-4 py-1.5 rounded-full font-bold ${levelInfo.rankClass.replace('rank-', 'text-')} bg-primary/10`}>
+                  <span className={`px-3 py-1 rounded-full font-bold text-xs ${levelInfo.rankClass.replace('rank-', 'text-')} bg-white/10 backdrop-blur-md`}>
                     Rank: {levelInfo.rank}
                   </span>
                 </div>
-
-                {/* Point summary inline */}
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm">
-                  <span className="text-[#c0c0d8]"><span className="text-primary font-bold">{profile.points}</span> point</span>
-                  <span className="text-[#c0c0d8]"><span className="text-amber-500 font-bold">{reviews.length}</span> anmeldelser</span>
-                  <span className="text-[#c0c0d8]">Gns. score: <span className="text-amber-500 font-bold">{avgScore}</span>/6</span>
+                  <span className="text-white/80"><span className="text-primary font-bold">{profile.points}</span> point</span>
+                  <span className="text-white/80"><span className="text-amber-400 font-bold">{reviews.length}</span> anmeldelser</span>
+                  <span className="text-white/80">Gns. score: <span className="text-amber-400 font-bold">{avgScore}</span>/6</span>
                 </div>
               </div>
             </div>
@@ -149,7 +155,7 @@ export default async function ProfilePage() {
           </div>
           <div className="w-full h-2 bg-[#0f0f1a] rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all"
+              className={`h-full bg-gradient-to-r ${heroGradient} rounded-full transition-all`}
               style={{ width: `${nextLevelData ? 100 - (pointsToNextLevel / parseInt(nextLevelData.points.split('-')[0]) * 100) : 100}%` }}
             />
           </div>
