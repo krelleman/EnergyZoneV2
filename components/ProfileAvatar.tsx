@@ -15,7 +15,8 @@ export default function ProfileAvatar({ displayName, level = 0, size = 'md', isA
   const displayLevel = isAdmin ? 10 : (level || 0)
   const userLevel = getLevel(displayLevel)
   const rankClass = userLevel.rankClass || 'rank-none'
-  const ringClass = `rank-ring-${rankClass.replace('rank-', '')}` || 'rank-ring-none'
+  // Admin bruger rank-ring-admin direkte
+  const ringClass = isAdmin ? 'rank-ring-admin' : `rank-ring-${rankClass.replace('rank-', '')}` || 'rank-ring-none'
 
   const sizeClasses = {
     sm: 'w-10 h-10 text-sm',
