@@ -201,6 +201,16 @@
   z-index: -1;
 }
 
+.rank-ring-admin::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 0, 0, 0.15);
+  animation: admin-glow-pulse 2s ease-in-out infinite;
+  z-index: -1;
+}
+
 .admin-badge {
   background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #0a0a0a);
   background-size: 200% 200%;
@@ -225,4 +235,11 @@
   50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.4), 0 0 80px rgba(0, 0, 0, 0.8); }
 }
 @keyframes admin-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-@keyframes admin-badge-glow { 0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.2); } 50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.4); } }
+@keyframes admin-glow-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+@keyframes admin-badge-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.2); border-color: #ff3333; }
+  50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.4); border-color: #ff6666; }
+}
