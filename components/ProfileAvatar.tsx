@@ -7,10 +7,13 @@ interface ProfileAvatarProps {
   displayName: string
   level?: number
   size?: 'sm' | 'md' | 'lg'
+  isAdmin?: boolean
 }
 
-export default function ProfileAvatar({ displayName, level = 0, size = 'md' }: ProfileAvatarProps) {
-  const userLevel = getLevel(level)
+export default function ProfileAvatar({ displayName, level = 0, size = 'md', isAdmin = false }: ProfileAvatarProps) {
+  // Admin får altid level 10 (Legend)
+  const displayLevel = isAdmin ? 10 : (level || 0)
+  const userLevel = getLevel(displayLevel)
   const rankClass = userLevel.rankClass || 'rank-none'
   const ringClass = `rank-ring-${rankClass.replace('rank-', '')}` || 'rank-ring-none'
 

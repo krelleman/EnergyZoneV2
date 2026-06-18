@@ -288,7 +288,7 @@ export default async function ProfilePage() {
     ? (reviews.reduce((acc: number, r: Review) => acc + r.score, 0) / reviews.length).toFixed(1)
     : '0'
 
-  const levelInfo = getLevel(profile.total_points || 0)
+  const levelInfo = getLevel((profile as any).isadmin ? 2000 : (profile.total_points || 0))
   const heroGradient = getHeroGradient(levelInfo.level)
   const badges = getBadges(levelInfo.level, reviews.length)
 
@@ -313,7 +313,7 @@ export default async function ProfilePage() {
           <div className="relative h-full flex items-center px-6 md:px-12">
             <div className="flex flex-col md:flex-row items-center md:items-end gap-4 md:gap-6">
               <div className="relative -mb-8 md:-mb-12">
-                <ProfileAvatar displayName={profile.display_name || 'Bruger'} level={profile.level || 0} size="lg" />
+                <ProfileAvatar displayName={profile.display_name || 'Bruger'} level={profile.level || 0} size="lg" isAdmin={!!(profile as any).isadmin} />
                 <div className="absolute -bottom-1 -right-1 bg-green-500 w-6 h-6 rounded-full border-2 border-[#1a1a2e] flex items-center justify-center text-xs">
                   ✓
                 </div>
@@ -323,17 +323,29 @@ export default async function ProfilePage() {
                   {profile.display_name || profile.email?.split('@')[0]}
                 </h1>
 <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
-                   <span className="bg-white/10 backdrop-blur-md text-white px-3 py-1 rounded-full font-bold text-xs">
-                     {levelInfo.title}
-                   </span>
-                   <span className={`px-3 py-1 rounded-full font-bold text-xs ${levelInfo.rankClass.replace('rank-', 'text-')} bg-white/10 backdrop-blur-md`}>
-                     Rank: {levelInfo.rank}
-                   </span>
-                   {(profile as any).isadmin && (
-                     <Link href="/admin" className="bg-primary/20 text-primary px-3 py-1 rounded-full font-bold text-xs hover:bg-primary/30 transition-colors">
-                       ⚡ Admin panel
-                     </Link>
-                   )}
+{(profile as any).isadmin ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl animate-pulse">👑</span>
+                        <span className="text-4xl font-bold bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 bg-clip-text text-transparent animate-pulse">
+                          ⚡ Admin
+                        </span>
+                        <span className="text-2xl animate-pulse">👑</span>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="bg-white/10 backdrop-blur-md text-white px-3 py-1 rounded-full font-bold text-xs">
+                          {levelInfo.title}
+                        </span>
+                        <span className={`px-3 py-1 rounded-full font-bold text-xs ${levelInfo.rankClass.replace('rank-', 'text-')} bg-white/10 backdrop-blur-md`}>
+                          Rank: {levelInfo.rank}
+                        </span>
+                        {(profile as any).isadmin && (
+                          <Link href="/admin" className="bg-primary/20 text-primary px-3 py-1 rounded-full font-bold text-xs hover:bg-primary/30 transition-colors">
+                            ⚡ Admin panel
+                          </Link>
+                        )}
+                      </>
+                    )}
                  </div>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm">
                   <span className="text-white/80"><span className="text-primary font-bold">{profile.total_points || 0}</span> point</span>
