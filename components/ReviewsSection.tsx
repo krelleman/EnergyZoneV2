@@ -72,14 +72,15 @@ export default async function ReviewsSection() {
                 {review.products && (
                   <Link href={`/product/${review.product_id}`} className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-700">
                     <div className="relative w-8 h-8 rounded bg-gray-700 flex-shrink-0">
-                      {review.products.thumbnail ? (
-                        <Image
-                          src={review.products.thumbnail}
-                          alt={review.products.name}
-                          fill
-                          className="object-cover rounded"
-                        />
-                      ) : (
+{review.products.thumbnail ? (
+                         <Image
+                           src={review.products.thumbnail}
+                           alt={review.products.name}
+                           fill
+                           className="object-cover rounded"
+                           unoptimized={true}
+                         />
+                       ) : (
                         <span className="text-xs flex items-center justify-center h-full">⚡</span>
                       )}
                     </div>

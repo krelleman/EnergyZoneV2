@@ -69,14 +69,15 @@ export default async function NewProducts() {
                   <span className="absolute top-2 left-2 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-full z-10">
                     NYT
                   </span>
-                  {product.thumbnail ? (
-                    <Image
-                      src={product.thumbnail}
-                      alt={product.name}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
+{product.thumbnail ? (
+                     <Image
+                       src={product.thumbnail}
+                       alt={product.name}
+                       fill
+                       className="object-cover"
+                       unoptimized={true}
+                     />
+                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-5xl">🥤</div>
                   )}
                 </div>

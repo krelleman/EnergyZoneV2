@@ -119,15 +119,16 @@ export default async function ProductPage({ params }: PageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Venstre: Billede */}
         <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl overflow-hidden aspect-square flex items-center justify-center relative">
-          {product.thumbnail ? (
-            <Image
-              src={product.thumbnail}
-              alt={product.name}
-              width={500}
-              height={500}
-              className="object-contain w-full h-full p-8"
-            />
-          ) : (
+{product.thumbnail ? (
+             <Image
+               src={product.thumbnail}
+               alt={product.name}
+               width={500}
+               height={500}
+               className="object-contain w-full h-full p-8"
+               unoptimized={true}
+             />
+           ) : (
             <span className="text-8xl">⚡</span>
           )}
 

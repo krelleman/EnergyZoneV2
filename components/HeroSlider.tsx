@@ -114,16 +114,17 @@ export default function HeroSlider({ products }: HeroSliderProps) {
             <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl"></div>
               <div className="relative w-full h-full flex items-center justify-center">
-                {product.thumbnail ? (
-                  <Image
-                    src={product.thumbnail}
-                    alt={product.name}
-                    width={300}
-                    height={300}
-                    className="object-contain drop-shadow-2xl"
-                    priority
-                  />
-                ) : (
+{product.thumbnail ? (
+                   <Image
+                     src={product.thumbnail}
+                     alt={product.name}
+                     width={300}
+                     height={300}
+                     className="object-contain drop-shadow-2xl"
+                     priority
+                     unoptimized={true}
+                   />
+                 ) : (
                   <div className="text-8xl md:text-9xl">🥤</div>
                 )}
               </div>

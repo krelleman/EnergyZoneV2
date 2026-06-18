@@ -60,14 +60,15 @@ function ProductMiniCard({ product, rank }: { product: Product; rank: number }) 
       <div className="bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-primary transition-all duration-200 h-full">
         <div className="flex items-center gap-3">
           <div className="relative w-16 h-16 rounded-lg bg-gradient-to-br from-gray-700 to-gray-900 flex-shrink-0 flex items-center justify-center overflow-hidden">
-            {product.thumbnail ? (
-              <Image
-                src={product.thumbnail}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
-            ) : (
+{product.thumbnail ? (
+               <Image
+                 src={product.thumbnail}
+                 alt={product.name}
+                 fill
+                 className="object-cover"
+                 unoptimized={true}
+               />
+             ) : (
               <span className="text-2xl">⚡</span>
             )}
           </div>
