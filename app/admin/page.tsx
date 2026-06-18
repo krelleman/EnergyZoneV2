@@ -117,7 +117,7 @@ export default async function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((p) => (
+                {products.map((p: Product) => (
                   <tr key={p.id} className="border-b border-gray-700/50 last:border-0">
                     <td className="py-2 text-white">{p.name}</td>
                     <td className="py-2 text-gray-400">{p.brand}</td>
