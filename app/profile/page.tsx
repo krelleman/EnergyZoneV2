@@ -119,6 +119,40 @@ function getHeroGradient(level: number): string {
   return gradients[level] || 'from-gray-600 to-gray-800'
 }
 
+interface Badge {
+  id: string
+  name: string
+  icon: string
+  description?: string
+  unlocked: boolean
+}
+
+function getBadges(userLevel: number, reviewCount: number): Badge[] {
+  return [
+    // Level badges
+    { id: 'level-1', name: 'New Taster', icon: '🟫', unlocked: userLevel >= 1 },
+    { id: 'level-2', name: 'Energy Recruit', icon: '🥉', unlocked: userLevel >= 2 },
+    { id: 'level-3', name: 'Caffeine Knower', icon: '🥈', unlocked: userLevel >= 3 },
+    { id: 'level-4', name: 'Turbo', icon: '🥇', unlocked: userLevel >= 4 },
+    { id: 'level-5', name: 'Hyper', icon: '💎', unlocked: userLevel >= 5 },
+    { id: 'level-6', name: 'Taste Expert', icon: '💠', unlocked: userLevel >= 6 },
+    { id: 'level-7', name: 'Master', icon: '👑', unlocked: userLevel >= 7 },
+    { id: 'level-8', name: 'Grandmaster', icon: '⭐', unlocked: userLevel >= 8 },
+    { id: 'level-9', name: 'Champion', icon: '🏆', unlocked: userLevel >= 9 },
+    { id: 'level-10', name: 'Legend', icon: '🌟', unlocked: userLevel >= 10 },
+    // Activity badges
+    { id: 'first-review', name: 'Første anmeld', icon: '🌟', unlocked: reviewCount >= 1 },
+    { id: '10-reviews', name: '10 Anmeldelser', icon: '💪', unlocked: reviewCount >= 10 },
+    { id: '50-reviews', name: '50 Anmeldelser', icon: '🏅', unlocked: reviewCount >= 50 },
+    { id: 'streak-7', name: 'Streak 7', icon: '🔥', unlocked: false },
+    { id: 'streak-30', name: 'Streak 30', icon: '⚡', unlocked: false },
+    { id: 'strawberry', name: 'Jordbær-ekspert', icon: '🍓', unlocked: false },
+    { id: 'invite-5', name: 'Inviter 5', icon: '🎯', unlocked: false },
+    { id: 'fridge-10', name: '10 i køleskab', icon: '📦', unlocked: false },
+    { id: 'group-founder', name: 'Gruppe-grundl.', icon: '🌐', unlocked: false },
+  ]
+}
+
 export default async function ProfilePage() {
   const profile = await getUserProfile()
   if (!profile) redirect('/?login=true')
@@ -134,6 +168,7 @@ export default async function ProfilePage() {
 
   const levelInfo = getLevel(profile.points)
   const heroGradient = getHeroGradient(levelInfo.level)
+  const badges = getBadges(profile.level || 0, reviews.length)
 
   // Calculate next level
   const currentLevelIndex = LEVELS.findIndex(l => l.level === levelInfo.level)
@@ -305,16 +340,24 @@ export default async function ProfilePage() {
           )}
         </section>
 
-        {/* Badges */}
+        {/* Achievement grid (Bite 11.4) */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Badges</h2>
-          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-            {['🥇', '🥈', '🥉'].map((badge: string) => (
-              <div key={badge} className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] text-center">
-                <span className="text-2xl block mb-1">{badge}</span>
-                <span className="text-xs text-[#a0a0b8]">T unlocked</span>
-              </div>
-            ))}
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+            {badges.map((badge: Badge) => {
+              const isUnlocked = badge.unlocked
+              return (
+                <div key={badge.id} className={`bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-3 border transition-all duration-200 ${isUnlocked ? 'border-primary/50 hover:border-primary' : 'border-[#2a2a3e]/50 grayscale opacity-50'}`}>
+                  <div className="text-center">
+                    <span className="text-2xl block mb-1">{isUnlocked ? badge.icon : '🔒'}</span>
+                    <span className="text-xs font-bold text-white block truncate">{badge.name}</span>
+                    {!isUnlocked && badge.description && (
+                      <span className="text-[10px] text-[#a0a0b8] block truncate">{badge.description}</span>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </section>
 
