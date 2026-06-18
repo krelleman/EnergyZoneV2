@@ -33,10 +33,13 @@ interface Product {
 
 interface User {
   id: string
-  email: string
+  email?: string
   display_name?: string
-  points: number
+  total_points: number
   level: number
+  fridge?: number[]
+  wishlist?: number[]
+  isadmin?: boolean
 }
 
 async function getUserProfile() {
@@ -46,23 +49,25 @@ async function getUserProfile() {
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, display_name, total_points, level, fridge, wishlist, isadmin')
     .eq('id', user.id)
     .single()
 
-  // Hvis profilen ikke findes - opret den
-  if (error || !profile) {
-    console.log('Profil findes ikke, opretter...', error)
-    const { data: newProfile, error: createError } = await supabase
-      .from('profiles')
-      .insert({
-        id: user.id,
-        email: user.email,
-        points: 0,
-        level: 0,
-      })
-      .select('*')
-      .single()
+// Hvis profilen ikke findes - opret den
+    if (error || !profile) {
+      console.log('Profil findes ikke, opretter...', error)
+      const { data: newProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          display_name: user.email?.split('@')[0] || 'Bruger',
+          total_points: 0,
+          level: 0,
+          fridge: [],
+          wishlist: [],
+        })
+        .select('*')
+        .single()
 
     if (createError) {
       console.log('Fejl ved oprettelse:', createError)
@@ -282,7 +287,7 @@ export default async function ProfilePage() {
     ? (reviews.reduce((acc: number, r: Review) => acc + r.score, 0) / reviews.length).toFixed(1)
     : '0'
 
-  const levelInfo = getLevel(profile.points)
+  const levelInfo = getLevel(profile.total_points || 0)
   const heroGradient = getHeroGradient(levelInfo.level)
   const badges = getBadges(levelInfo.level, reviews.length)
 
@@ -292,7 +297,7 @@ export default async function ProfilePage() {
     ? LEVELS[currentLevelIndex + 1]
     : null
   const pointsToNextLevel = nextLevelData
-    ? Math.max(0, parseInt(nextLevelData.points.split('-')[0]) - profile.points)
+    ? Math.max(0, parseInt(nextLevelData.points.split('-')[0]) - (profile.total_points || 0))
     : 0
 
   return (
@@ -330,7 +335,7 @@ export default async function ProfilePage() {
                    )}
                  </div>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm">
-                  <span className="text-white/80"><span className="text-primary font-bold">{profile.points}</span> point</span>
+                  <span className="text-white/80"><span className="text-primary font-bold">{profile.total_points || 0}</span> point</span>
                   <span className="text-white/80"><span className="text-amber-400 font-bold">{reviews.length}</span> anmeldelser</span>
                   <span className="text-white/80">Gns. score: <span className="text-amber-400 font-bold">{avgScore}</span>/6</span>
                 </div>
@@ -343,7 +348,7 @@ export default async function ProfilePage() {
         <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-2xl p-6 border border-[#2a2a3e] mb-8">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-[#a0a0b8]">Næste level: {nextLevelData?.title || 'Max'}</span>
-            <span className="text-sm font-bold text-primary">{profile.points} / {nextLevelData ? nextLevelData.points.split('-')[0] : 'Max'} point</span>
+            <span className="text-sm font-bold text-primary">{profile.total_points || 0} / {nextLevelData ? nextLevelData.points.split('-')[0] : 'Max'} point</span>
           </div>
 <div className="w-full h-2 bg-[#0f0f1a] rounded-full overflow-hidden">
               <div
