@@ -7,13 +7,18 @@ export async function createClient() {
 
   // Hvis env vars mangler – returner mock (undgår build-fejl)
   if (!supabaseUrl || !supabaseKey) {
+    const mockQueryBuilder: any = {
+      select: () => mockQueryBuilder,
+      eq: () => mockQueryBuilder,
+      single: () => ({ data: null, error: null }),
+      order: () => mockQueryBuilder,
+      limit: () => mockQueryBuilder,
+      insert: () => ({ data: null, error: null }),
+      update: () => mockQueryBuilder,
+      delete: () => mockQueryBuilder,
+    }
     return {
-      from: () => ({
-        select: () => ({ data: [], error: null }),
-        insert: () => ({ data: null, error: null }),
-        update: () => ({ data: null, error: null }),
-        delete: () => ({ data: null, error: null }),
-      }),
+      from: () => mockQueryBuilder,
       auth: {
         getUser: async () => ({ data: { user: null }, error: null }),
         getSession: async () => ({ data: { session: null }, error: null }),
