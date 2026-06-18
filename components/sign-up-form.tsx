@@ -48,6 +48,20 @@ export function SignUpForm({
         },
       });
       if (error) throw error;
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('profiles').insert({
+          id: user.id,
+          email: user.email || email,
+          display_name: email.split('@')[0],
+          points: 0,
+          level: 1,
+        });
+      }
+
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");

@@ -49,22 +49,8 @@ export default function AuthModal() {
       if (error) {
         setMessage(error.message)
       } else if (data?.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            email: email,
-            display_name: username.trim(),
-            points: 0,
-            level: 0,
-          })
-
-        if (profileError) {
-          console.error('Fejl ved oprettelse af profil:', profileError)
-          setMessage('Bruger oprettet, men profilen kunne ikke gemmes.')
-        } else {
-          setMessage('✅ Bruger oprettet! Tjek din email for at bekræfte.')
-        }
+        console.log('Bruger oprettet - profil oprettes automatisk via trigger')
+        setMessage('✅ Bruger oprettet! Tjek din email for at bekræfte.')
       }
     }
     setLoading(false)

@@ -22,7 +22,7 @@ interface User {
   display_name?: string
   points: number
   level: number
-  is_admin?: boolean
+  isadmin?: boolean
 }
 
 interface Review {
@@ -42,10 +42,10 @@ async function isAdmin() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('is_admin')
+    .select('isadmin')
     .eq('id', user.id)
     .single()
-  return profile?.is_admin === true
+  return profile?.isadmin === true
 }
 
 async function getProducts() {
