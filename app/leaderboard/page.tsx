@@ -1,0 +1,100 @@
+import { createClient } from '@/utils/supabase/server'
+import Link from 'next/link'
+import { getLevel } from '@/lib/levels'
+
+interface LeaderboardUser {
+  id: string
+  display_name?: string
+  total_points: number
+  level: number
+}
+
+export default async function LeaderboardPage() {
+  const supabase = await createClient()
+
+  const { data: users } = await supabase
+    .from('profiles')
+    .select('id, display_name, total_points, level')
+    .order('total_points', { ascending: false })
+    .limit(10) as { data: LeaderboardUser[] | null }
+
+  const topUsers = users || []
+
+  return (
+    <main className="min-h-screen bg-[#0f0f1a] text-[#e8e8f0] py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <h1 className="text-3xl font-bold text-white mb-8 text-center">Leaderboard</h1>
+
+        {topUsers.length > 0 ? (
+          <>
+            {/* Top 3 Podium */}
+            <div className="flex justify-center items-end gap-4 mb-12">
+              {topUsers[0] && (
+                <div className="flex flex-col items-center">
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-2 bg-amber-400">🥇</div>
+                  <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] w-32 text-center">
+                    <p className="font-bold text-white truncate">{topUsers[0].display_name || 'Ukendt'}</p>
+                    <p className="text-sm text-primary">{topUsers[0].total_points || 0} point</p>
+                    <p className="text-xs text-[#a0a0b8]">{getLevel(topUsers[0].total_points || 0).emoji} {getLevel(topUsers[0].total_points || 0).title}</p>
+                  </div>
+                </div>
+              )}
+              {topUsers[1] && (
+                <div className="flex flex-col items-center">
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-2 bg-gray-300">🥈</div>
+                  <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] w-32 text-center">
+                    <p className="font-bold text-white truncate">{topUsers[1].display_name || 'Ukendt'}</p>
+                    <p className="text-sm text-primary">{topUsers[1].total_points || 0} point</p>
+                    <p className="text-xs text-[#a0a0b8]">{getLevel(topUsers[1].total_points || 0).emoji} {getLevel(topUsers[1].total_points || 0).title}</p>
+                  </div>
+                </div>
+              )}
+              {topUsers[2] && (
+                <div className="flex flex-col items-center">
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-2 bg-orange-400">🥉</div>
+                  <div className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] w-32 text-center">
+                    <p className="font-bold text-white truncate">{topUsers[2].display_name || 'Ukendt'}</p>
+                    <p className="text-sm text-primary">{topUsers[2].total_points || 0} point</p>
+                    <p className="text-xs text-[#a0a0b8]">{getLevel(topUsers[2].total_points || 0).emoji} {getLevel(topUsers[2].total_points || 0).title}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Række 4-10 */}
+            <div className="space-y-2">
+              {topUsers.slice(3).map((user, index) => {
+                const levelInfo = getLevel(user.total_points || 0)
+                return (
+                  <div key={user.id} className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="text-primary font-bold text-lg w-8">#{index + 4}</span>
+                      <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                        <span className="text-primary font-bold">
+                          {(user.display_name || 'U').charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <span className="text-white font-medium">{user.display_name || 'Ukendt'}</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-primary font-bold">{user.total_points || 0} point</span>
+                      <span className="text-xs text-[#a0a0b8]">{levelInfo.emoji} Level {user.level || 0}</span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          <p className="text-[#a0a0b8] text-center py-12">Ingen brugere fundet endnu.</p>
+        )}
+
+        <div className="mt-12 text-center">
+          <Link href="/" className="text-primary hover:underline">
+            ← Tilbage til forsiden
+          </Link>
+        </div>
+      </div>
+    </main>
+  )
+}

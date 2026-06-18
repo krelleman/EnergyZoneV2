@@ -1,12 +1,13 @@
 'use client'
 
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 
 interface Toast {
   id: string
   message: string
   type: 'success' | 'error' | 'info' | 'warning'
   emoji?: string
+  exiting?: boolean
 }
 
 interface ToastContextType {
@@ -25,10 +26,37 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       console.log('🔔 setToasts, nye toasts:', [...prev, { id, message, type, emoji }])
       return [...prev, { id, message, type, emoji }]
     })
+    // Start fade-out 0.5 sekunder før fjernelse
+    setTimeout(() => {
+      setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t))
+    }, 3500)
+    // Fjern efter totalt 4 sekunder
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id))
-    }, 4000) // Længere duration
+    }, 4000)
   }
+
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes fadeOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+      }
+      .animate-slide-in {
+        animation: slideIn 0.3s ease-out forwards;
+      }
+      .animate-fade-out {
+        animation: fadeOut 0.5s ease-out forwards;
+      }
+    `
+    document.head.appendChild(style)
+    return () => { document.head.removeChild(style) }
+  }, [])
 
   const getBorderColor = (type: string) => {
     if (type === 'success') return '#10b981'
@@ -47,7 +75,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map(toast => (
           <div
             key={toast.id}
-            className={`bg-[#1a1a2e] border-l-4 rounded-r-lg px-4 py-3 pr-8 shadow-lg pointer-events-auto animate-slide-in`}
+            className={`bg-[#1a1a2e] border-l-4 rounded-r-lg px-4 py-3 pr-8 shadow-lg pointer-events-auto ${toast.exiting ? 'animate-fade-out' : 'animate-slide-in'}`}
             style={{
               borderLeftColor: getBorderColor(toast.type),
             }}
