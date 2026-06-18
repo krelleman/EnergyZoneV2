@@ -1,6 +1,7 @@
 // app/profile/page.tsx
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
 import ProfileAvatar from '@/components/ProfileAvatar'
 import { getLevel, LEVELS } from '@/lib/levels'
@@ -237,7 +238,7 @@ export default async function ProfilePage() {
 
   const levelInfo = getLevel(profile.points)
   const heroGradient = getHeroGradient(levelInfo.level)
-  const badges = getBadges(profile.level || 0, reviews.length)
+  const badges = getBadges(levelInfo.level, reviews.length)
 
   // Calculate next level
   const currentLevelIndex = LEVELS.findIndex(l => l.level === levelInfo.level)
@@ -269,14 +270,19 @@ export default async function ProfilePage() {
                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
                   {profile.display_name || profile.email?.split('@')[0]}
                 </h1>
-                <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
-                  <span className="bg-white/10 backdrop-blur-md text-white px-3 py-1 rounded-full font-bold text-xs">
-                    {levelInfo.title}
-                  </span>
-                  <span className={`px-3 py-1 rounded-full font-bold text-xs ${levelInfo.rankClass.replace('rank-', 'text-')} bg-white/10 backdrop-blur-md`}>
-                    Rank: {levelInfo.rank}
-                  </span>
-                </div>
+<div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
+                   <span className="bg-white/10 backdrop-blur-md text-white px-3 py-1 rounded-full font-bold text-xs">
+                     {levelInfo.title}
+                   </span>
+                   <span className={`px-3 py-1 rounded-full font-bold text-xs ${levelInfo.rankClass.replace('rank-', 'text-')} bg-white/10 backdrop-blur-md`}>
+                     Rank: {levelInfo.rank}
+                   </span>
+                   {(profile as any).isadmin && (
+                     <Link href="/admin" className="bg-primary/20 text-primary px-3 py-1 rounded-full font-bold text-xs hover:bg-primary/30 transition-colors">
+                       ⚡ Admin panel
+                     </Link>
+                   )}
+                 </div>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm">
                   <span className="text-white/80"><span className="text-primary font-bold">{profile.points}</span> point</span>
                   <span className="text-white/80"><span className="text-amber-400 font-bold">{reviews.length}</span> anmeldelser</span>

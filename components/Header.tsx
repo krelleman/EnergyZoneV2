@@ -67,9 +67,6 @@ export default function Header() {
           <Link href="/leaderboard" className="text-white hover:text-primary transition-colors text-sm font-medium">
             Leaderboard
           </Link>
-          <Link href="/admin" className="text-white hover:text-primary transition-colors text-sm font-medium">
-            Admin
-          </Link>
           <Link href="/profile" className="text-white hover:text-primary transition-colors text-sm font-medium">
             Min Profil
           </Link>
