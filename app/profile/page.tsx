@@ -43,13 +43,18 @@ async function getUserProfile() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from('profiles')
-    .select('id, email, display_name, points, level, fridge, wishlist')
+    .select('*')
     .eq('id', user.id)
-    .single() as { data: User | null }
+    .single()
 
-  return profile
+  if (error) {
+    console.log('Profil fejl:', error)
+    return null
+  }
+
+  return profile as User | null
 }
 
 async function getFridgeProducts() {
@@ -57,11 +62,16 @@ async function getFridgeProducts() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from('profiles')
     .select('fridge')
     .eq('id', user.id)
     .single()
+
+  if (error) {
+    console.log('Fridge fejl:', error)
+    return []
+  }
 
   const fridgeIds = profile?.fridge || []
   const productIds = Array.isArray(fridgeIds) ? fridgeIds.map((p: any) => Number(p)).filter((p: number) => !isNaN(p)) : []
@@ -81,11 +91,16 @@ async function getWishlistProducts() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from('profiles')
     .select('wishlist')
     .eq('id', user.id)
     .single()
+
+  if (error) {
+    console.log('Wishlist fejl:', error)
+    return []
+  }
 
   const wishlistIds = profile?.wishlist || []
   const productIds = Array.isArray(wishlistIds) ? wishlistIds.map((p: any) => Number(p)).filter((p: number) => !isNaN(p)) : []
@@ -209,7 +224,7 @@ function getTimeAgo(date: Date): string {
 
 export default async function ProfilePage() {
   const profile = await getUserProfile()
-  if (!profile) redirect('/?login=true')
+  if (!profile) redirect('/?login=true&message=profile_required')
 
   const reviews = await getReviews()
   const fridgeProducts = await getFridgeProducts()
