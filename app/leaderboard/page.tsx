@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { getLevel } from '@/lib/levels'
+import LeaderboardTabs from '@/components/LeaderboardTabs'
 
 interface LeaderboardUser {
   id: string
@@ -61,29 +62,11 @@ export default async function LeaderboardPage() {
               )}
             </div>
 
-            {/* Række 4-10 */}
-            <div className="space-y-2">
-              {topUsers.slice(3).map((user, index) => {
-                const levelInfo = getLevel(user.total_points || 0)
-                return (
-                  <div key={user.id} className="bg-[#1a1a2e]/80 backdrop-blur-md rounded-xl p-4 border border-[#2a2a3e] flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <span className="text-primary font-bold text-lg w-8">#{index + 4}</span>
-                      <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
-                        <span className="text-primary font-bold">
-                          {(user.display_name || 'U').charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <span className="text-white font-medium">{user.display_name || 'Ukendt'}</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-primary font-bold">{user.total_points || 0} point</span>
-                      <span className="text-xs text-[#a0a0b8]">{levelInfo.emoji} Level {user.level || 0}</span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+{/* Række 4-10 */}
+             <LeaderboardTabs 
+               globalUsers={topUsers.slice(3)} 
+               friendUsers={topUsers.slice(0, 3)} 
+             />
           </>
         ) : (
           <p className="text-[#a0a0b8] text-center py-12">Ingen brugere fundet endnu.</p>
