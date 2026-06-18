@@ -27,7 +27,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     })
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id))
-    }, 3000)
+    }, 4000) // Længere duration
   }
 
   const getBorderColor = (type: string) => {

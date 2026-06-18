@@ -25,6 +25,7 @@ interface Product {
 export default function ProductCard({ product }: { product: Product }) {
   const { showToast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+
   const stars = '⭐'.repeat(Math.round(product.company_score || 0))
   const emptyStars = '☆'.repeat(6 - Math.round(product.company_score || 0))
   const totalScore = product.total_score || 0
@@ -42,12 +43,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Image */}
         <div className="relative h-48 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
           {product.thumbnail ? (
-            <Image
-              src={product.thumbnail}
-              alt={product.name}
-              fill
-              className="object-cover"
-            />
+            <img src={product.thumbnail} alt={product.name} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-6xl">⚡</div>
           )}
@@ -99,7 +95,7 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
           )}
 
-{/* Price + Buttons */}
+          {/* Price + Buttons */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
             <div>
               {product.price_min_dkk && product.price_max_dkk ? (
@@ -117,41 +113,48 @@ export default function ProductCard({ product }: { product: Product }) {
                 <span className="text-xl font-bold text-primary">{product.price_dkk} kr</span>
               )}
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1">
               <button
                 onClick={async (e) => {
                   e.preventDefault()
-                  console.log('🍺 1. Klik registreret')
-                  console.log('🍺 2. showToast type:', typeof showToast)
+                  showToast(`⏳ Tilføjer ${product.name}...`, 'info', '⏳')
                   setIsSubmitting(true)
-                  const result = await addToFridge(product.id)
-                  console.log('🍺 3. Resultat fra addToFridge:', result)
-                  if (result.alreadyExists) {
-                    showToast(`${product.name} er allerede i køleskabet!`, 'warning', '⚠️')
-                  } else {
-                    showToast(`${product.name} tilføjet til køleskabet!`, 'success', '🧊')
+                  try {
+                    const result = await addToFridge(product.id)
+                    if (result.alreadyExists) {
+                      showToast(`✅ ${product.name} er allerede i køleskabet!`, 'success', '✅')
+                    } else {
+                      showToast(`✅ ${product.name} tilføjet til køleskabet!`, 'success', '🧊')
+                    }
+                  } catch (err) {
+                    showToast(`Der opstod en fejl`, 'error', '❌')
                   }
                   setIsSubmitting(false)
                 }}
                 disabled={isSubmitting}
-                className="text-xs bg-primary text-white px-3 py-1.5 rounded-full hover:bg-primary-dark transition-colors disabled:opacity-50"
+                className="text-xs bg-primary text-white px-3 py-1.5 rounded-full hover:bg-primary-dark disabled:opacity-50 transition-colors"
               >
-                {isSubmitting ? 'Tilføjer...' : 'Jeg har drukket den'}
+                {isSubmitting ? 'Tilføjer...' : '🍺 Køleskab'}
               </button>
               <button
                 onClick={async (e) => {
                   e.preventDefault()
+                  showToast(`⏳ Tilføjer til ønskelisten...`, 'info', '⏳')
                   setIsSubmitting(true)
-                  const result = await addToWishlist(product.id)
-                  if (result.alreadyExists) {
-                    showToast(`${product.name} er allerede i ønskelisten!`, 'warning', '⚠️')
-                  } else {
-                    showToast(`${product.name} tilføjet til ønskelisten!`, 'info', '❤️')
+                  try {
+                    const result = await addToWishlist(product.id)
+                    if (result.alreadyExists) {
+                      showToast(`💝 ${product.name} er allerede på ønskelisten!`, 'info', '💝')
+                    } else {
+                      showToast(`💝 ${product.name} tilføjet til ønskelisten!`, 'info', '❤️')
+                    }
+                  } catch (err) {
+                    showToast(`Der opstod en fejl`, 'error', '❌')
                   }
                   setIsSubmitting(false)
                 }}
                 disabled={isSubmitting}
-                className="text-xs bg-gray-700 text-white px-3 py-1.5 rounded-full hover:bg-gray-600 transition-colors disabled:opacity-50"
+                className="text-xs bg-gray-700 text-white px-3 py-1.5 rounded-full hover:bg-gray-600 disabled:opacity-50 transition-colors"
               >
                 ❤️ Ønskeliste
               </button>
