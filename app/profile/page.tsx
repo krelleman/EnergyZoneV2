@@ -102,6 +102,23 @@ async function getFavorites() {
   return products?.map(p => ({ ...p, user_score: reviews.find(r => r.product_id === p.id)?.score })) || []
 }
 
+function getHeroGradient(level: number): string {
+  const gradients: Record<number, string> = {
+    0: 'from-gray-600 to-gray-800',
+    1: 'from-amber-700 to-amber-500',
+    2: 'from-orange-700 to-orange-500',
+    3: 'from-yellow-600 to-yellow-400',
+    4: 'from-amber-400 to-yellow-500',
+    5: 'from-blue-400 to-cyan-300',
+    6: 'from-cyan-400 to-blue-300',
+    7: 'from-purple-600 to-purple-400',
+    8: 'from-red-600 to-red-400',
+    9: 'from-orange-500 to-red-500',
+    10: 'from-purple-900 via-purple-600 to-pink-500',
+  }
+  return gradients[level] || 'from-gray-600 to-gray-800'
+}
+
 export default async function ProfilePage() {
   const profile = await getUserProfile()
   if (!profile) redirect('/?login=true')
@@ -116,8 +133,7 @@ export default async function ProfilePage() {
     : '0'
 
   const levelInfo = getLevel(profile.points)
-  const rankClass = levelInfo.rankClass.replace('rank-', '')
-  const gradientClass = `rank-gradient-${rankClass}`
+  const heroGradient = getHeroGradient(levelInfo.level)
 
   // Calculate next level
   const currentLevelIndex = LEVELS.findIndex(l => l.level === levelInfo.level)
@@ -133,7 +149,7 @@ export default async function ProfilePage() {
       <div className="container mx-auto px-4 max-w-6xl">
 
         {/* HERO BANNER - Level gradient (Bite 11.1) */}
-        <div className={`relative rounded-b-3xl overflow-hidden mb-12 h-48 md:h-64 ${gradientClass}`}>
+        <div className={`relative rounded-b-3xl overflow-hidden mb-12 h-48 md:h-64 bg-gradient-to-r ${heroGradient}`}>
           <div className="absolute inset-0 opacity-30">
             <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.15)_0%,transparent_70%)]"></div>
           </div>
@@ -175,7 +191,7 @@ export default async function ProfilePage() {
           </div>
 <div className="w-full h-2 bg-[#0f0f1a] rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all"
+                className={`h-full bg-gradient-to-r ${heroGradient} rounded-full transition-all`}
                 style={{ width: `${nextLevelData ? 100 - (pointsToNextLevel / parseInt(nextLevelData.points.split('-')[0]) * 100) : 100}%` }}
               />
             </div>
