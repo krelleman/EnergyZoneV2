@@ -50,7 +50,7 @@ export default function AuthModal() {
         setMessage(error.message)
       } else if (data?.user) {
         const { error: profileError } = await supabase
-          .from('users')
+          .from('profiles')
           .insert({
             id: data.user.id,
             email: email,

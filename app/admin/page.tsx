@@ -41,7 +41,7 @@ async function isAdmin() {
   if (!user) return false
 
   const { data: profile } = await supabase
-    .from('users')
+    .from('profiles')
     .select('is_admin')
     .eq('id', user.id)
     .single()
@@ -61,7 +61,7 @@ async function getProducts() {
 async function getUsers() {
   const supabase = await createClient()
   const { data } = await supabase
-    .from('users')
+    .from('profiles')
     .select('*')
     .order('points', { ascending: false })
     .limit(50)

@@ -17,7 +17,7 @@ export default function Header() {
       setUser(user)
       if (user) {
         const { data: profile } = await supabase
-          .from('users')
+          .from('profiles')
           .select('display_name')
           .eq('id', user.id)
           .single()
@@ -31,7 +31,7 @@ export default function Header() {
       setUser(user)
       if (user) {
         const { data: profile } = await supabase
-          .from('users')
+          .from('profiles')
           .select('display_name')
           .eq('id', user.id)
           .single()

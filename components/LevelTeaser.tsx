@@ -8,7 +8,7 @@ async function getUserLevel() {
   if (!user) return null
 
   const { data } = await supabase
-    .from('users')
+    .from('profiles')
     .select('points, level')
     .eq('id', user.id)
     .single()

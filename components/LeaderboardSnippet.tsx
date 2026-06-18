@@ -11,7 +11,7 @@ interface LeaderboardUser {
 async function getLeaderboard() {
   const supabase = await createClient()
   const { data } = await supabase
-    .from('users')
+    .from('profiles')
     .select('id, display_name, points, level')
     .order('points', { ascending: false })
     .limit(3)

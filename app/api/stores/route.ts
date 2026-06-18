@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Ikke logget ind' }, { status: 401 })
   
   const { data: profile } = await supabase
-    .from('users')
+    .from('profiles')
     .select('is_admin')
     .eq('id', user.id)
     .single()
